@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BossGuild Kanso</title>
+    <meta name="theme-color" content="#FDFCF8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/9385/9385210.png">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    colors: {
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            300: '#d6d3d1',
+                            400: '#a8a29e',
+                            500: '#78716c',
+                            600: '#57534e',
+                            700: '#44403c',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                        },
+                        paper: '#FDFCF8',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -10px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+
+    <style>
+        /* Custom Overrides for Kanso Feel */
+        body {
+            background-color: #FDFCF8;
+            color: #44403C;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* Dark Mode overrides */
+        [data-theme="dark"] body {
+            background-color: #1C1917;
+            color: #E7E5E4;
+        }
+
+        /* Particles - Hidden for Kanso but kept for logic compatibility */
+        .particles { display: none; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E7E5E4; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D6D3D1; }
+
+        /* Glass Panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        [data-theme="dark"] .glass-panel {
+            background: rgba(41, 37, 36, 0.6);
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: #FFFFFF;
+            border: 1px solid #F5F5F4;
+            border-radius: 20px;
+            padding: 1.25rem;
+            display: flex; align-items: center; gap: 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+        }
+        [data-theme="dark"] .metric-card {
+            background: #292524;
+            border-color: #44403C;
+        }
+
+        .metric-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            background: #FAFAF9; color: #78716C;
+        }
+        [data-theme="dark"] .metric-icon { background: #44403C; color: #A8A29E; }
+        
+        /* Metric States */
+        .metric-used .metric-icon { background: #F5F5F4; color: #57534E; }
+        .metric-used .value { color: #57534E; }
+        .metric-remain .metric-icon { background: #FFF7ED; color: #C2410C; }
+        .metric-remain .value { color: #C2410C; }
+        [data-theme="dark"] .metric-remain .metric-icon { background: #431407; color: #FB923C; }
+        [data-theme="dark"] .metric-remain .value { color: #FB923C; }
+
+        /* Toolbar Buttons */
+        .tool-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: #78716C;
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 500; font-size: 0.85rem;
+            position: relative;
+        }
+        
+        /* Hover States */
+        .tool-btn:hover { 
+            background: #F5F5F4; 
+            color: #1C1917;
+            transform: translateY(-1px);
+        }
+        [data-theme="dark"] .tool-btn:hover { 
+            background: rgba(255, 255, 255, 0.05); 
+            color: #F5F5F4; 
+        }
+
+        /* Active (Selected) State */
+        .tool-btn.active {
+            background: #292524; 
+            color: #FFFFFF;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            transform: none;
+        }
+        .tool-btn.active:hover {
+            background: #1C1917;
+            transform: none;
+        }
+        
+        [data-theme="dark"] .tool-btn.active { 
+            background: #FAFAF9; 
+            color: #1C1917;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        [data-theme="dark"] .tool-btn.active:hover {
+            background: #F5F5F4;
+        }
+
+        /* Pressed Interaction (:active) */
+        .tool-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .btn-copy { background: #E7E5E4 !important; color: #44403C !important; }
+
+        /* Inputs */
+        .input-minimal {
+            background: transparent;
+            border: 1px solid transparent;
+            border-bottom: 1px solid #E7E5E4;
+            color: #44403C;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            width: 100%;
+            text-align: center;
+            padding: 6px;
+            border-radius: 4px;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+        [data-theme="dark"] .input-minimal { color: #E7E5E4; border-color: #44403C; }
+        .input-minimal:focus {
+            background: #FFFFFF;
+            border-color: #A8A29E;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] .input-minimal:focus { background: #292524; }
+        
+        .input-damage { font-variant-numeric: tabular-nums; text-align: right; padding-right: 8px; }
+
+        /* Table */
+        .table-wrapper {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            position: relative;
+        }
+        [data-theme="dark"] .table-wrapper { background: #1C1917; border-color: #292524; }
+
+        table { width: 100%; border-collapse: collapse; }
+        
+        thead th {
+            padding: 1rem;
+            color: #A8A29E;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 1px solid #F5F5F4;
+            background: #FDFCF8;
+            position: sticky; /* Sticky Header */
+            top: 0;
+            z-index: 20;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        [data-theme="dark"] thead th { background: #292524; border-color: #44403C; }
+        
+        tbody tr { 
+            transition: background-color 0.15s ease; 
+            border-bottom: 1px solid #FAFAF9;
+            border-left: 3px solid transparent; /* Placeholder for status border */
+        }
+        [data-theme="dark"] tbody tr { border-color: #292524; }
+        tbody tr:hover { background: #FAFAF9; }
+        [data-theme="dark"] tbody tr:hover { background: #292524; }
+
+        td { padding: 1rem 0.5rem; text-align: center; vertical-align: middle; }
+        .member-name { font-weight: 500; color: #292524; cursor: pointer; }
+        [data-theme="dark"] .member-name { color: #E7E5E4; }
+        
+        /* Status Colors - Elegant Gradient */
+        tr.status-risk { 
+            background: linear-gradient(to right, rgba(254, 202, 202, 0.4), transparent);
+            border-left-color: #EF4444;
+        }
+        tr.status-god { 
+            background: linear-gradient(to right, rgba(254, 243, 199, 0.4), transparent);
+            border-left-color: #EAB308;
+        }
+        [data-theme="dark"] tr.status-risk { 
+            background: linear-gradient(to right, rgba(239, 68, 68, 0.15), transparent);
+            border-left-color: #EF4444;
+        }
+        [data-theme="dark"] tr.status-god { 
+            background: linear-gradient(to right, rgba(234, 179, 8, 0.15), transparent);
+            border-left-color: #EAB308;
+        }
+
+        .fill-able { cursor: pointer; padding: 2px 8px; border-radius: 6px; transition: 0.2s; }
+        .fill-able:hover { background: #F5F5F4; }
+        [data-theme="dark"] .fill-able:hover { background: #44403C; }
+
+        .dead-toggle {
+            font-size: 0.6rem; padding: 2px 8px; border-radius: 99px;
+            cursor: pointer; background: #F5F5F4; color: #A8A29E;
+            margin-top: 4px; display: inline-block; font-weight: 600;
+        }
+        .dead-toggle.is-dead { background: #FEE2E2; color: #EF4444; }
+
+        .cell-dead { opacity: 0.3; pointer-events: none; background: #FAFAF9; }
+        [data-theme="dark"] .cell-dead { background: #000; }
+
+        /* HP Panel */
+        .hp-panel { display: none; padding: 1.5rem; animation: fadeIn 0.5s ease; }
+        .hp-panel.active { display: block; }
+        .hp-card {
+            background: #FFFFFF; padding: 16px; border-radius: 16px;
+            border: 1px solid #F5F5F4;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+        [data-theme="dark"] .hp-card { background: #292524; border-color: #44403C; }
+        .hp-track { height: 8px; background: #F5F5F4; border-radius: 99px; overflow: hidden; margin-top: 10px; position: relative; }
+        [data-theme="dark"] .hp-track { background: #44403C; }
+        .hp-fill { height: 100%; background: #DFA8A8; transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .hp-overlay-text { font-size: 0.65rem; color: #78716C; margin-top: 4px; display: block; text-align: right; }
+
+        /* Damage Helper */
+        .damage-helper {
+            position: absolute; display: none; background: #FFFFFF;
+            padding: 8px; border-radius: 16px; z-index: 1000;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #F5F5F4; flex-direction: column; gap: 6px; animation: popIn 0.2s;
+        }
+        [data-theme="dark"] .damage-helper { background: #292524; border-color: #44403C; }
+        .damage-helper.active { display: flex; }
+        .helper-btn {
+            font-size: 0.75rem; padding: 6px 12px; background: #F5F5F4; color: #57534E;
+            border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 600;
+        }
+        .helper-btn:hover { background: #E7E5E4; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(253, 252, 248, 0.8);
+            backdrop-filter: blur(8px); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        [data-theme="dark"] .modal-overlay { background: rgba(0,0,0,0.8); }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        
+        .modal {
+            background: #FFFFFF; border: 1px solid #F5F5F4; color: #44403C;
+            padding: 2.5rem; border-radius: 32px; width: 90%; max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            transform: translateY(20px); transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        [data-theme="dark"] .modal { background: #1C1917; border-color: #292524; color: #E7E5E4; }
+        .modal-overlay.active .modal { transform: translateY(0); }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px;
+            background: #FFFFFF; border: 1px solid #F5F5F4; border-left: 3px solid #44403C;
+            padding: 1rem 1.5rem; border-radius: 12px; color: #44403C;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            transform: translateX(120%); transition: 0.4s; z-index: 2000;
+            display: flex; align-items: center; gap: 1rem; font-weight: 500;
+        }
+        .toast.show { transform: translateX(0); }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        /* Export Options */
+        .export-option {
+            background: #FFFFFF; border: 1px solid #F5F5F4; border-radius: 20px;
+            padding: 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        [data-theme="dark"] .export-option { background: #292524; border-color: #44403C; }
+        .export-option:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.06); }
+        .export-icon {
+            font-size: 1.5rem; color: #78716C; width: 56px; height: 56px;
+            border-radius: 50%; background: #FAFAF9;
+            display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        [data-theme="dark"] .export-icon { background: #44403C; color: #A8A29E; }
+        .export-option:hover .export-icon { background: #292524; color: white; }
+        [data-theme="dark"] .export-option:hover .export-icon { background: #FAFAF9; color: #1C1917; }
+
+        /* OCR Boss Modal Grid */
+        .ocr-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .ocr-option {
+            background: #FAFAF9;
+            border: 1px solid #E7E5E4;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        [data-theme="dark"] .ocr-option { background: #292524; border-color: #44403C; color: #E7E5E4; }
+
+        .ocr-option:hover {
+            background: #57534E;
+            color: white;
+            transform: translateY(-3px);
+            border-color: #57534E;
+        }
+
+        /* Auto Backup List */
+        .backup-list {
+            margin-top: 20px;
+            border-top: 1px solid #E7E5E4;
+            padding-top: 15px;
+        }
+        [data-theme="dark"] .backup-list { border-color: #44403C; }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 0.9rem;
+            color: #57534E;
+        }
+        [data-theme="dark"] .backup-item { color: #A8A29E; border-color: #44403C; }
+
+        .backup-restore-btn {
+            background: transparent;
+            border: 1px solid #A8A29E;
+            color: #A8A29E;
+            padding: 4px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .backup-restore-btn:hover {
+            background: #A8A29E;
+            color: white;
+        }
+
+        /* Misc */
+        .divider { width: 1px; height: 20px; background: #E7E5E4; margin: 0 0.5rem; }
+        .highlight { background: #FEF3C7; padding: 0 4px; border-radius: 4px; }
+        
+        #story-export {
+            position: fixed; top: -9999px; left: -9999px;
+            width: 1080px; height: 1920px;
+            background: #FDFCF8; color: #44403C;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        [data-theme="dark"] #story-export { background: #1C1917; color: #E7E5E4; }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .toolbar { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 0.5rem; }
+            .tool-btn { white-space: nowrap; font-size: 0.8rem; padding: 0.5rem 1rem; }
+            .modal { width: 100%; border-radius: 32px 32px 0 0; position: fixed; bottom: 0; top: auto; transform: translateY(100%); margin: 0; max-width: none; }
+            .modal-overlay.active .modal { transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Elements -->
+    <div class="particles" id="particles"></div>
+    <div id="toast" class="toast">
+        <i class="fas fa-info-circle text-stone-400"></i>
+        <span id="toast-msg">Notification</span>
+    </div>
+
+    <!-- Drag Drop Overlay -->
+    <div id="drag-overlay" class="fixed inset-0 z-[3000] bg-stone-900/80 backdrop-blur-sm hidden flex-col items-center justify-center pointer-events-auto transition-opacity duration-300">
+        <div class="animate-bounce mb-4">
+            <i class="fas fa-file-import text-6xl text-stone-200"></i>
+        </div>
+        <h2 class="font-serif text-3xl text-stone-200">Drop Image to Scan</h2>
+    </div>
+
+    <!-- Hidden Inputs -->
+    <input type="file" id="ocrInput" accept="image/*" style="display:none" onchange="handleOCRFile(this)">
+
+    <!-- Damage Helper (Floating) -->
+    <div id="damage-helper" class="damage-helper" onmousedown="event.preventDefault()">
+        <div class="flex gap-2">
+            <button class="helper-btn" onclick="quickAddDamage(1000000)">+1M</button>
+            <button class="helper-btn" onclick="quickAddDamage(10000000)">+10M</button>
+        </div>
+        <button class="helper-btn text-red-400 hover:bg-red-50 hover:text-red-500 w-full" onclick="quickAddDamage(0, true)">Clear</button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="max-w-[1200px] mx-auto p-4 md:p-8 pb-32 relative z-10" id="main-container">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+            <div class="app-title">
+                <h1 class="font-serif text-4xl md:text-5xl font-bold text-stone-800 dark:text-stone-100 tracking-tight mb-2">
+                    BossGuild
+                    <span class="text-xs align-middle bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 px-3 py-1 rounded-full font-sans font-medium uppercase tracking-widest ml-2">A4XX</span>
+                </h1>
+                <p class="text-stone-400 font-light text-sm tracking-wide">Tracker & Analytics</p>
+            </div>
+            <div class="flex gap-2">
+                <button class="tool-btn" onclick="toggleSound()" id="btn-sound"><i class="fas fa-volume-up"></i></button>
+                <button class="tool-btn" onclick="toggleShortcuts()"><i class="fas fa-keyboard"></i></button>
+                <button class="tool-btn" onclick="toggleSettings()" title="Settings"><i class="fas fa-cog"></i></button>
+                <button class="tool-btn" onclick="toggleTheme()" title="Toggle Theme"><i class="fas fa-adjust"></i></button>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="glass-panel p-6 mb-8" id="dashboard-panel">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                
+                <!-- Chart 1 -->
+                <div class="relative h-64 flex items-center justify-center">
+                    <canvas id="woodChart"></canvas>
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <span id="chart-percent" class="font-serif text-5xl font-medium text-stone-800 dark:text-stone-100">0%</span>
+                    </div>
+                </div>
+
+                <!-- Metrics Column -->
+                <div class="flex flex-col gap-3 justify-center">
+                    <!-- Row 1: Total -->
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="flex-1">
+                            <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Total Goal</h4>
+                            <p class="text-2xl font-semibold text-stone-800 dark:text-stone-100 leading-none" id="total-attempts">0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Row 2: Completed / Remaining -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="metric-card metric-used p-3 gap-2">
+                            <div class="metric-icon w-10 h-10 text-sm"><i class="fas fa-check"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 truncate">Completed</h4>
+                                <p class="text-xl font-semibold value leading-none" id="used-attempts">0</p>
+                            </div>
+                        </div>
+                        <div class="metric-card metric-remain p-3 gap-2">
+                            <div class="metric-icon w-10 h-10 text-sm"><i class="fas fa-clock"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 truncate">Remaining</h4>
+                                <p class="text-xl font-semibold value leading-none" id="remaining-attempts">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Avg / Missing -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 rounded-2xl p-4 text-center">
+                            <div class="text-stone-400 text-xs font-medium uppercase tracking-wider mb-1">Daily Avg</div>
+                            <div class="text-xl font-bold text-stone-700 dark:text-stone-200" id="daily-avg">0</div>
+                        </div>
+                        <div class="bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 rounded-2xl p-4 text-center">
+                            <div class="text-stone-400 text-xs font-medium uppercase tracking-wider mb-1">Missing</div>
+                            <div class="text-lg font-bold text-stone-700 dark:text-stone-200" id="missing-count">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart 2 -->
+                <div class="h-48 flex items-center justify-center relative">
+                    <canvas id="bossBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- HP Panel -->
+        <div class="glass-panel hp-panel mb-6" id="hp-panel">
+            <h3 class="font-serif text-lg text-stone-700 dark:text-stone-200 mb-6 border-b border-stone-100 dark:border-stone-700 pb-2">Boss Health Status</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="hp-grid">
+                <!-- JS Injects Here -->
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="mb-6 overflow-x-auto pb-2">
+            <div class="bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 rounded-full p-2 inline-flex items-center gap-1 shadow-sm">
+                <button class="tool-btn active" id="tab-1" onclick="switchPage(1)">Shadow</button>
+                <button class="tool-btn" id="tab-2" onclick="switchPage(2)">God of Destruction</button>
+                
+                <div class="divider"></div>
+                
+                <button class="tool-btn" onclick="undo()" title="Undo"><i class="fas fa-undo"></i></button>
+                <button class="tool-btn" onclick="toggleCompact()" title="Compact View"><i class="fas fa-list"></i></button>
+                <button class="tool-btn" onclick="toggleMode()" id="btn-mode"><i class="fas fa-calculator"></i></button>
+                <button class="tool-btn" onclick="toggleFilter('risk')" id="btn-filter-risk"><i class="fas fa-filter"></i> Risk</button>
+                <button class="tool-btn" onclick="triggerOCR()" title="Scan Image"><i class="fas fa-camera"></i></button>
+                
+                <div class="divider"></div>
+                
+                <button class="tool-btn btn-copy" onclick="copyTextReport()"><i class="fas fa-copy"></i> Copy</button>
+                <button class="tool-btn" onclick="openExportModal()"><i class="fas fa-share-alt"></i></button>
+                
+                <div class="divider"></div>
+                
+                <button class="tool-btn text-red-400 hover:text-red-600 hover:bg-red-50" onclick="resetWeek()"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- Controls / Search -->
+        <div class="bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 rounded-2xl p-4 mb-6 flex flex-wrap gap-4 items-end shadow-sm">
+            <div>
+                <label class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 block">Days</label>
+                <input type="number" id="totalDays" value="11" class="bg-stone-50 dark:bg-stone-900 border-b border-stone-200 dark:border-stone-600 text-stone-700 dark:text-stone-200 font-medium text-center w-16 p-2 rounded focus:bg-white focus:outline-none focus:border-stone-400 transition-colors" onchange="updateGlobalDays()">
+            </div>
+            
+            <div>
+                <label class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 block">Members</label>
+                <div id="totalMembers" class="bg-stone-50 dark:bg-stone-900 text-stone-500 font-medium text-center w-16 p-2 rounded cursor-default border-b border-transparent">0</div>
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+                <label class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 block">Search</label>
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-3 text-stone-400 text-xs"></i>
+                    <input type="text" id="searchInput" placeholder="Find member..." class="w-full bg-stone-50 dark:bg-stone-900 border border-transparent rounded-xl pl-9 pr-8 py-2 text-sm text-stone-700 dark:text-stone-200 focus:bg-white dark:focus:bg-stone-700 focus:border-stone-200 focus:outline-none transition-all" onkeyup="searchMembers()">
+                    <i class="fas fa-times absolute right-3 top-3 text-stone-400 cursor-pointer hover:text-stone-600" onclick="clearSearch()"></i>
+                </div>
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+                <label class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 block">Add New</label>
+                <div class="flex gap-2">
+                    <input type="text" id="newMemberName" placeholder="Name..." class="flex-1 bg-stone-50 dark:bg-stone-900 border border-transparent rounded-xl px-4 py-2 text-sm text-stone-700 dark:text-stone-200 focus:bg-white dark:focus:bg-stone-700 focus:border-stone-200 focus:outline-none transition-all">
+                    <button class="bg-stone-800 text-white w-10 h-10 rounded-xl hover:bg-stone-700 transition-colors flex items-center justify-center" onclick="addMember()"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+            <table id="main-table">
+                <thead>
+                    <tr id="table-head">
+                        <!-- JS Generated -->
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- JS Generated -->
+                </tbody>
+                <tfoot id="table-foot" class="bg-stone-50 dark:bg-stone-900 text-xs font-bold text-stone-500 uppercase">
+                    <!-- JS Generated -->
+                </tfoot>
+            </table>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-20">
+                <div class="w-20 h-20 bg-stone-50 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-users text-3xl text-stone-300"></i>
+                </div>
+                <h3 class="font-serif text-xl text-stone-700 dark:text-stone-200 mb-2">No Members Yet</h3>
+                <p class="text-stone-400 text-sm">Add your first guild member to start tracking.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- OCR Progress Modal -->
+    <div class="modal-overlay" id="ocrProgressModal" style="z-index: 2500;">
+        <div class="modal max-w-sm text-center">
+            <div class="mb-6 flex justify-center">
+                 <div class="w-16 h-16 bg-stone-50 dark:bg-stone-800 rounded-full flex items-center justify-center animate-bounce">
+                    <i class="fas fa-camera text-2xl text-stone-400"></i>
+                 </div>
+            </div>
+            <h3 class="font-serif text-xl text-stone-800 dark:text-stone-100 mb-2">Scanning</h3>
+            <p id="ocrStatusText" class="text-sm text-stone-400 mb-6 font-medium">Initializing...</p>
+            
+            <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-2 overflow-hidden">
+                <div id="ocrProgressBar" class="bg-stone-800 dark:bg-stone-200 h-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            </div>
+            <div id="ocrProgressPercent" class="text-xs text-stone-400 mt-2 font-mono">0%</div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal">
+            <div class="flex justify-between items-center mb-8 pb-4 border-b border-stone-100 dark:border-stone-700">
+                <h3 class="font-serif text-2xl text-stone-800 dark:text-stone-100">Share & Export</h3>
+                <button class="text-stone-400 hover:text-stone-600" onclick="closeModal('exportModal')"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="export-option" onclick="generateShareLink()">
+                    <div class="export-icon"><i class="fas fa-link"></i></div>
+                    <div><h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Copy Link</h4><p class="text-xs text-stone-400">Share URL</p></div>
+                </div>
+                <div class="export-option" onclick="exportImage('standard')">
+                    <div class="export-icon"><i class="fas fa-image"></i></div>
+                    <div><h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Save Image</h4><p class="text-xs text-stone-400">PNG Format</p></div>
+                </div>
+                <div class="export-option" onclick="exportImage('story')">
+                    <div class="export-icon"><i class="fab fa-instagram"></i></div>
+                    <div><h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">IG Story</h4><p class="text-xs text-stone-400">Vertical Format</p></div>
+                </div>
+                <div class="export-option" onclick="exportPDF()">
+                    <div class="export-icon"><i class="fas fa-file-pdf"></i></div>
+                    <div><h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Report PDF</h4><p class="text-xs text-stone-400">Printable</p></div>
+                </div>
+                <div class="export-option" onclick="exportJSON()">
+                    <div class="export-icon"><i class="fas fa-download"></i></div>
+                    <div><h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Backup</h4><p class="text-xs text-stone-400">JSON File</p></div>
+                </div>
+                <div class="export-option" onclick="triggerImportJSON()">
+                    <div class="export-icon"><i class="fas fa-upload"></i></div>
+                    <div><h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Restore</h4><p class="text-xs text-stone-400">From JSON</p></div>
+                </div>
+                <div class="export-option" onclick="exportCSV()">
+                    <div class="export-icon"><i class="fas fa-file-csv"></i></div>
+                    <div><h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Excel</h4><p class="text-xs text-stone-400">CSV Data</p></div>
+                </div>
+                <div class="export-option" onclick="triggerImportCSV()">
+                    <div class="export-icon"><i class="fas fa-file-import"></i></div>
+                    <div><h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Import CSV</h4><p class="text-xs text-stone-400">Load Data</p></div>
+                </div>
+            </div>
+
+            <div class="border-t border-stone-100 dark:border-stone-700 pt-6">
+                <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">Auto Backups</h4>
+                <div id="backup-container" class="space-y-2"></div>
+            </div>
+
+            <div class="mt-8 flex justify-center">
+                <div id="qrcode" class="p-2 bg-white border border-stone-100 rounded-xl"></div>
+            </div>
+            
+            <input type="file" id="jsonImportInput" accept=".json" class="hidden" onchange="handleJSONImport(this)">
+            <input type="file" id="csvImportInput" accept=".csv" class="hidden" onchange="handleCSVImport(this)">
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <div class="flex items-center gap-4 mb-6 pb-6 border-b border-stone-100 dark:border-stone-700">
+                <div class="w-16 h-16 rounded-2xl bg-stone-800 text-white flex items-center justify-center text-2xl font-serif" id="profile-avatar">A</div>
+                <div class="flex-1">
+                    <h2 id="profile-name" class="font-serif text-2xl text-stone-800 dark:text-stone-100">Name</h2>
+                    <span class="text-xs text-stone-400 uppercase tracking-widest">Guild Member</span>
+                </div>
+                <button class="text-stone-400 hover:text-stone-600" onclick="closeModal('profileModal')"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            
+            <div class="flex gap-4 mb-6">
+                <div class="flex-1 bg-stone-50 dark:bg-stone-800 rounded-xl p-4 text-center">
+                    <div class="text-xs text-stone-400 uppercase tracking-wider mb-1">Daily Avg</div>
+                    <div id="profile-daily" class="text-xl font-bold text-stone-700 dark:text-stone-200">0</div>
+                </div>
+                <div class="flex-1 bg-stone-50 dark:bg-stone-800 rounded-xl p-4 text-center">
+                    <div class="text-xs text-stone-400 uppercase tracking-wider mb-1">Completion</div>
+                    <div id="profile-completion" class="text-xl font-bold text-stone-700 dark:text-stone-200">0%</div>
+                </div>
+            </div>
+
+            <div class="h-48 mb-6">
+                <canvas id="profileRadarChart"></canvas>
+            </div>
+
+            <div id="profile-stats" class="space-y-2 text-sm text-stone-600 dark:text-stone-300 border-t border-stone-100 dark:border-stone-700 pt-4 mb-4"></div>
+
+            <div>
+                <label class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Notes</label>
+                <textarea id="profile-note" rows="3" class="w-full bg-stone-50 dark:bg-stone-800 border border-transparent rounded-xl p-3 text-sm dark:text-stone-200 focus:bg-white dark:focus:bg-stone-700 focus:border-stone-200 focus:outline-none transition-all"></textarea>
+            </div>
+            
+            <button class="w-full mt-6 bg-stone-800 text-white py-3 rounded-xl font-medium hover:bg-stone-700 transition-colors" onclick="saveProfileNote()">Save Details</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="flex justify-between items-center mb-8 pb-4 border-b border-stone-100 dark:border-stone-700">
+                <h3 class="font-serif text-2xl text-stone-800 dark:text-stone-100">Settings</h3>
+                <button class="text-stone-400 hover:text-stone-600" onclick="closeModal('settingsModal')"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Max Boss HP</label>
+                    <input type="number" id="settingMaxHP" class="w-full bg-stone-50 dark:bg-stone-800 border border-transparent rounded-xl p-3 text-sm dark:text-stone-200 focus:bg-white dark:focus:bg-stone-700 focus:border-stone-200 focus:outline-none transition-all">
+                </div>
+                
+                <div class="border-t border-stone-100 dark:border-stone-700 pt-6">
+                    <label class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Bulk Add Members (One per line)</label>
+                    <textarea id="bulkNames" rows="6" class="w-full bg-stone-50 dark:bg-stone-800 border border-transparent rounded-xl p-3 text-sm dark:text-stone-200 focus:bg-white dark:focus:bg-stone-700 focus:border-stone-200 focus:outline-none transition-all" placeholder="Name1&#10;Name2&#10;Name3"></textarea>
+                    <button class="w-full mt-4 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-3 rounded-xl font-medium hover:bg-stone-300 dark:hover:bg-stone-600 transition-colors" onclick="bulkImportMembers()">Import Names</button>
+                </div>
+
+                <button class="w-full bg-stone-800 text-white py-3 rounded-xl font-medium hover:bg-stone-700 transition-colors" onclick="saveSettings()">Save Configuration</button>
+
+                <div class="border-t border-stone-100 dark:border-stone-700 pt-6 mt-6">
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl p-4">
+                        <h4 class="text-xs font-bold text-red-500 uppercase tracking-widest mb-2">Danger Zone</h4>
+                        <button class="w-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 py-3 rounded-xl font-medium hover:bg-red-200 dark:hover:bg-red-900/60 transition-colors" onclick="factoryReset()">Factory Reset (Clear All Data)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shortcuts Modal -->
+    <div class="modal-overlay" id="shortcutsModal">
+        <div class="modal text-center">
+            <h3 class="font-serif text-2xl mb-6 text-stone-800 dark:text-stone-100">Keyboard Shortcuts</h3>
+            <div class="text-left space-y-4 text-stone-600 dark:text-stone-300">
+                <div class="flex justify-between border-b border-stone-100 dark:border-stone-700 pb-2"><span>Undo last action</span> <kbd class="bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded">Ctrl + Z</kbd></div>
+                <div class="flex justify-between border-b border-stone-100 dark:border-stone-700 pb-2"><span>Force Save</span> <kbd class="bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded">Ctrl + S</kbd></div>
+                <div class="flex justify-between border-b border-stone-100 dark:border-stone-700 pb-2"><span>Scan Image (OCR)</span> <kbd class="bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded">Ctrl + V</kbd></div>
+                <div class="flex justify-between border-b border-stone-100 dark:border-stone-700 pb-2"><span>Close Modals</span> <kbd class="bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded">Esc</kbd></div>
+            </div>
+            <button class="w-full mt-8 bg-stone-800 text-white py-3 rounded-xl font-medium" onclick="closeModal('shortcutsModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- OCR Boss Selection Modal -->
+    <div class="modal-overlay" id="ocrBossModal">
+        <div class="modal">
+            <div class="flex justify-between items-center mb-8 pb-4 border-b border-stone-100 dark:border-stone-700">
+                <h3 class="font-serif text-2xl text-stone-800 dark:text-stone-100">Select Boss</h3>
+                <button class="text-stone-400 hover:text-stone-600" onclick="closeModal('ocrBossModal')"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <p class="text-center text-stone-500 mb-8">Which boss results are you scanning?</p>
+            <div class="ocr-grid" id="ocr-options">
+                <!-- JS will populate -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden IG Story Export Layout -->
+    <div id="story-export">
+        <h1 style="font-size: 6rem; margin-bottom: 20px; font-weight:800; color: #44403C;">BossGuild</h1>
+        <h2 style="font-size: 3rem; opacity: 0.8; margin-bottom: 100px; color: #78716C;">WEEKLY SUMMARY</h2>
+        <div style="width: 600px; height: 600px; margin-bottom: 100px;"><canvas id="storyChart"></canvas></div>
+        <div style="font-size: 3rem; text-align: center; color: #44403C;">
+            <p style="margin-bottom: 20px;">Total Attempts <strong style="color:#57534E" id="story-wood">0</strong></p>
+            <p>MVP <strong style="color:#d97706" id="story-mvp">-</strong></p>
+        </div>
+    </div>
+
+    <script>
+        // --- State & Constants ---
+        let CONSTANTS = {
+            ICONS: ['⚔️', '🏹', '🔮', '🛡️', '🐉'],
+            BOSS_NAMES: ['Teo', 'Kyle', 'Yeonhee', 'Karma'],
+            BOSS_IMAGES: [
+                'Teo.png',    // Index 0: Teo Placeholder
+                'Kyle.png',    // Index 1: Kyle Placeholder
+                'Yeonhee.png',    // Index 2: Yeonhee Placeholder
+                'Karma.png',    // Index 3: Karma Placeholder
+                'God.png'     // Index 4: God of Destruction Placeholder
+            ],
+            BOSS_MAX_HP: 100000000
+        };
+
+        const STATE = {
+            page: 1,
+            days1: 11,
+            days2: 11,
+            deadBosses: { 1: [false, false, false, false], 2: [false] },
+            members: [],
+            history: [],
+            historyIndex: -1,
+            filter: 'all',
+            compact: false,
+            soundEnabled: true,
+            chart: null,
+            barChart: null,
+            radarChart: null,
+            selectedMember: null,
+            mode: 'count', // 'count' or 'damage'
+            sort: { key: null, order: 'desc', index: -1 },
+            config: { bossMaxHp: 100000000 },
+            goalReached: false
+        };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(type) {
+            if (!STATE.soundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'pop') {
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'success') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554, now + 0.1);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
+            } else if (type === 'delete') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            }
+        }
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initCharts();
+            render();
+            setupShortcuts();
+            populateOCRModal();
+            setupDragAndDrop();
+
+            // Auto Backup Interval (5 mins)
+            setInterval(autoBackup, 300000);
+            renderBackups();
+
+            // Check for Share Data in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('data')) {
+                try {
+                    const decoded = JSON.parse(decodeURIComponent(escape(atob(urlParams.get('data')))));
+                    if (confirm("Found shared data in URL. Load it? (This will overwrite current data)")) {
+                        importData(decoded);
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                } catch (e) { console.error("Invalid Share Data"); }
+            }
+
+            // Re-init Sortable for Drag & Drop
+            new Sortable(document.getElementById('table-body'), {
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: function (evt) {
+                    const item = STATE.members.splice(evt.oldIndex, 1)[0];
+                    STATE.members.splice(evt.newIndex, 0, item);
+                    saveState('reorder');
+                }
+            });
+        });
+
+        function populateOCRModal() {
+            const container = document.getElementById('ocr-options');
+            let html = '';
+            CONSTANTS.BOSS_NAMES.forEach((name, idx) => {
+                html += `
+                <div class="ocr-option group" onclick="selectOCRBoss(${idx})">
+                    <img src="${CONSTANTS.BOSS_IMAGES[idx]}" class="w-16 h-16 rounded-2xl object-cover mb-2 border border-stone-200 shadow-sm transition-transform group-hover:scale-105" alt="${name}">
+                    <div class="font-semibold">${name}</div>
+                </div>`;
+            });
+            // Add God of Destruction Option
+            html += `
+            <div class="ocr-option" style="grid-column: span 2;" onclick="selectOCRBoss(4)">
+                <img src="${CONSTANTS.BOSS_IMAGES[4]}" class="w-16 h-16 rounded-2xl object-cover mb-2 border border-stone-200 shadow-sm transition-transform group-hover:scale-105" alt="God of Destruction">
+                <div class="font-semibold">God of Destruction</div>
+            </div>`;
+            container.innerHTML = html;
+        }
+
+        // --- Data Management ---
+        function saveState(action = 'update') {
+            // History Push
+            if (STATE.historyIndex < STATE.history.length - 1) STATE.history = STATE.history.slice(0, STATE.historyIndex + 1);
+            STATE.history.push(JSON.stringify({ members: STATE.members, deadBosses: STATE.deadBosses }));
+            STATE.historyIndex++;
+            if (STATE.history.length > 20) { STATE.history.shift(); STATE.historyIndex--; }
+
+            // LocalStorage
+            const data = {
+                members: STATE.members,
+                days1: STATE.days1,
+                days2: STATE.days2,
+                deadBosses: STATE.deadBosses,
+                theme: document.documentElement.getAttribute('data-theme'),
+                mode: STATE.mode,
+                sort: STATE.sort,
+                config: STATE.config
+            };
+            localStorage.setItem('bossGuildData', JSON.stringify(data));
+            updateAnalytics();
+        }
+
+        function loadData() {
+            const stored = localStorage.getItem('bossGuildData');
+            if (stored) {
+                const data = JSON.parse(stored);
+                // Ensure 'd' (damage) array exists for old data
+                STATE.members = (data.members || []).map(m => ({
+                    ...m,
+                    d: m.d || [0, 0, 0, 0],
+                    v: m.v || [0, 0, 0, 0],
+                    note: m.note || ""
+                }));
+                STATE.days1 = data.days1 || 11;
+                STATE.days2 = data.days2 || 11;
+                STATE.deadBosses = data.deadBosses || { 1: [false, false, false, false], 2: [false] };
+                STATE.mode = data.mode || 'count';
+                STATE.sort = data.sort || { key: null, order: 'desc', index: -1 };
+                STATE.config = data.config || { bossMaxHp: 100000000 };
+                
+                CONSTANTS.BOSS_MAX_HP = STATE.config.bossMaxHp;
+
+                if (data.theme) document.documentElement.setAttribute('data-theme', data.theme);
+                document.getElementById('totalDays').value = STATE.page === 1 ? STATE.days1 : STATE.days2;
+            } else {
+                // Default Data
+                STATE.members = [
+                    { name: "Player1", v: [0, 0, 0, 0], d: [0, 0, 0, 0], v2: 0, note: "" }
+                ];
+            }
+        }
+
+        function importData(data) {
+            STATE.members = (data.members || []).map(m => ({ ...m, d: m.d || [0, 0, 0, 0] }));
+            STATE.days1 = data.days1 || 11;
+            STATE.days2 = data.days2 || 11;
+            STATE.deadBosses = data.deadBosses || { 1: [false, false, false, false], 2: [false] };
+            document.getElementById('totalDays').value = STATE.page === 1 ? STATE.days1 : STATE.days2;
+            saveState('import');
+            render();
+        }
+
+        function undo() {
+            if (STATE.historyIndex > 0) {
+                STATE.historyIndex--;
+                const prev = JSON.parse(STATE.history[STATE.historyIndex]);
+                STATE.members = prev.members;
+                STATE.deadBosses = prev.deadBosses;
+                render();
+                updateAnalytics();
+                showToast("Undo Successful", "info");
+            }
+        }
+
+        // --- Auto Backup System ---
+        function autoBackup() {
+            const currentData = localStorage.getItem('bossGuildData');
+            const now = new Date().toLocaleString();
+            // Shift backups
+            localStorage.setItem('backup_3', localStorage.getItem('backup_2'));
+            localStorage.setItem('backup_2', localStorage.getItem('backup_1'));
+            localStorage.setItem('backup_1', JSON.stringify({ data: currentData, time: now }));
+            renderBackups();
+        }
+
+        function renderBackups() {
+            const container = document.getElementById('backup-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= 3; i++) {
+                const b = localStorage.getItem(`backup_${i}`);
+                if (b) {
+                    const parsed = JSON.parse(b);
+                    if (parsed.time) {
+                        const div = document.createElement('div');
+                        div.className = 'backup-item';
+                        div.innerHTML = `<span>Backup ${i} (${parsed.time})</span> <button class="backup-restore-btn" onclick="restoreBackup(${i})">Restore</button>`;
+                        container.appendChild(div);
+                    }
+                }
+            }
+        }
+
+        function restoreBackup(idx) {
+            const b = localStorage.getItem(`backup_${idx}`);
+            if (b) {
+                const parsed = JSON.parse(b);
+                if (parsed.data) {
+                    importData(JSON.parse(parsed.data));
+                    showToast(`Restored Backup ${idx}`, 'success');
+                    closeModal('exportModal');
+                }
+            }
+        }
+
+        function factoryReset() {
+            if (confirm("⚠️ DANGER: FACTORY RESET\n\nThis will completely wipe ALL your data and cannot be undone.\n\nAre you absolutely sure?")) {
+                localStorage.removeItem('bossGuildData');
+                location.reload();
+            }
+        }
+
+        // --- Analytics ---
+        function getMemberStats(m) {
+            const total1 = (m.v || []).reduce((a, b) => a + b, 0);
+            const total2 = m.v2 || 0;
+            const current = STATE.page === 1 ? total1 : total2;
+            const days = STATE.page === 1 ? STATE.days1 : STATE.days2;
+
+            return {
+                total: current,
+                isRisk: current < (days * 0.5),
+                isPerfect: current >= days
+            };
+        }
+
+        function updateAnalytics() {
+            const days = STATE.page === 1 ? STATE.days1 : STATE.days2;
+            let grandTotal = 0;
+            let missingCount = 0;
+
+            const bossTotals = [0, 0, 0, 0];
+            const bossDamage = [0, 0, 0, 0];
+
+            STATE.members.forEach(m => {
+                const stats = getMemberStats(m);
+                grandTotal += stats.total;
+                
+                if (stats.total < days) {
+                    missingCount++;
+                }
+
+                if (STATE.page === 1) {
+                    if (m.v) m.v.forEach((val, i) => bossTotals[i] += val);
+                    if (m.d) m.d.forEach((val, i) => bossDamage[i] += val);
+                }
+            });
+
+            // Update Empty State
+            const hasMembers = STATE.members && STATE.members.length > 0;
+            document.getElementById('empty-state').style.display = hasMembers ? 'none' : 'block';
+            document.getElementById('main-table').style.display = hasMembers ? 'table' : 'none';
+            if (document.getElementById('totalMembers')) {
+                document.getElementById('totalMembers').innerText = STATE.members.length;
+            }
+
+            // Update Metrics
+            const totalPossible = days * STATE.members.length;
+            const percent = totalPossible > 0 ? Math.min(100, (grandTotal / totalPossible * 100)).toFixed(1) : 0;
+
+            // Confetti Trigger
+            const percentVal = parseFloat(percent);
+            if (percentVal >= 100 && !STATE.goalReached) {
+                STATE.goalReached = true;
+                showToast("🎉 Goal Complete!", "success");
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                
+                var random = function(min, max) { return Math.random() * (max - min) + min; }
+
+                var interval = setInterval(function() {
+                  var timeLeft = animationEnd - Date.now();
+                  if (timeLeft <= 0) { return clearInterval(interval); }
+                  var particleCount = 50 * (timeLeft / duration);
+                  // Stone Theme Colors
+                  const colors = ['#78716C', '#D6D3D1', '#E7E5E4', '#F5F5F4'];
+                  
+                  confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 }, colors: colors }));
+                  confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 }, colors: colors }));
+                }, 250);
+            } else if (percentVal < 100) {
+                STATE.goalReached = false;
+            }
+
+            document.getElementById('total-attempts').innerText = totalPossible;
+            document.getElementById('used-attempts').innerText = grandTotal;
+            document.getElementById('remaining-attempts').innerText = Math.max(0, totalPossible - grandTotal);
+            document.getElementById('chart-percent').innerText = percent + '%';
+
+            const dailyAvg = STATE.members.length > 0 ? (grandTotal / STATE.members.length).toFixed(1) : 0;
+            document.getElementById('daily-avg').innerText = dailyAvg;
+            
+            // Missing Count Logic
+            const missingEl = document.getElementById('missing-count');
+            if (missingCount === 0) {
+                missingEl.innerText = "All Done";
+                missingEl.className = "text-lg font-bold text-emerald-600 dark:text-emerald-400";
+            } else {
+                missingEl.innerText = missingCount;
+                missingEl.className = "text-lg font-bold text-amber-600 dark:text-amber-500";
+            }
+
+            // Update Charts
+            if (STATE.chart) {
+                STATE.chart.data.datasets[0].data = [grandTotal, Math.max(0, totalPossible - grandTotal)];
+                STATE.chart.data.datasets[0].backgroundColor = ['#D97706', '#E7E5E4']; // Amber, Stone
+                STATE.chart.update();
+            }
+            if (STATE.barChart) {
+                if (STATE.page === 1) {
+                    STATE.barChart.data.labels = CONSTANTS.BOSS_NAMES;
+                    STATE.barChart.data.datasets[0].label = STATE.mode === 'damage' ? 'Total Damage' : 'Attempts';
+                    STATE.barChart.data.datasets[0].data = STATE.mode === 'damage' ? bossDamage : bossTotals;
+                    STATE.barChart.data.datasets[0].backgroundColor = '#A8A29E'; // Stone 400
+                } else {
+                    STATE.barChart.data.labels = ['God of Destruction'];
+                    STATE.barChart.data.datasets[0].data = [grandTotal];
+                }
+                STATE.barChart.update();
+            }
+
+            // Update HP Panel
+            if (STATE.page === 1 && STATE.mode === 'damage') {
+                const hpContainer = document.getElementById('hp-grid');
+                let hpHTML = '';
+                CONSTANTS.BOSS_NAMES.forEach((name, i) => {
+                    const dmg = bossDamage[i];
+                    const p = Math.min(100, (dmg / CONSTANTS.BOSS_MAX_HP) * 100).toFixed(1);
+                    const isDead = STATE.deadBosses[1][i];
+                    // Refined HP Colors
+                    const barColor = Number(p) >= 100 ? '#57534E' : '#D97706'; // Stone vs Amber
+                    
+                    hpHTML += `
+                    <div class="hp-card" style="${isDead ? 'opacity:0.5; filter:grayscale(1);' : ''}">
+                        <div class="flex justify-between items-center mb-2">
+                             <div class="flex items-center gap-2">
+                                <img src="${CONSTANTS.BOSS_IMAGES[i]}" class="w-8 h-8 rounded-lg object-cover border border-stone-100 shadow-sm" alt="${name}">
+                                <span class="font-bold text-sm text-stone-700 dark:text-stone-200">${name}</span>
+                             </div>
+                             <span class="text-sm font-bold text-stone-500">${p}%</span>
+                        </div>
+                        <div class="hp-track">
+                            <div class="hp-fill" style="width:${p}%; background: ${barColor}"></div>
+                        </div>
+                        <div class="hp-overlay-text">${dmg.toLocaleString()} / ${(CONSTANTS.BOSS_MAX_HP / 1000000).toFixed(0)}M</div>
+                    </div>`;
+                });
+                hpContainer.innerHTML = hpHTML;
+                document.getElementById('hp-panel').classList.add('active');
+            } else {
+                document.getElementById('hp-panel').classList.remove('active');
+            }
+        }
+
+        // --- Rendering ---
+        function render() {
+            const thead = document.getElementById('table-head');
+            const tbody = document.getElementById('table-body');
+            const tfoot = document.getElementById('table-foot');
+
+            // Mode Button State
+            const btnMode = document.getElementById('btn-mode');
+            btnMode.innerHTML = STATE.mode === 'damage' ? '<i class="fas fa-calculator"></i> Dmg' : '<i class="fas fa-calculator"></i> Count';
+            btnMode.classList.toggle('active', STATE.mode === 'damage');
+
+            // 1. Headers
+            let headers = '<th style="width:30px"></th><th style="cursor:pointer; user-select:none; text-align:left;" onclick="sortMembers(\'name\')">Member ' + getSortIcon('name') + '</th>';
+            if (STATE.page === 1) {
+                CONSTANTS.BOSS_NAMES.forEach((name, i) => {
+                    const isDead = STATE.deadBosses[1][i];
+                    headers += `
+                    <th style="cursor:pointer; user-select:none;" onclick="sortMembers('boss', ${i})">
+                        <div class="flex flex-col items-center gap-1 group">
+                            <img src="${CONSTANTS.BOSS_IMAGES[i]}" class="w-12 h-12 rounded-xl object-cover border border-stone-200 shadow-sm transition-transform group-hover:scale-105" alt="${name}">
+                            <span class="fill-able ${isDead ? 'opacity-50' : ''} text-xs font-bold mt-1" onclick="event.stopPropagation(); quickFill(${i})">${name}</span>
+                            <span class="dead-toggle ${isDead ? 'is-dead' : ''}" onclick="event.stopPropagation(); toggleDead(${i})">${isDead ? 'DEAD' : 'ALIVE'}</span>
+                            ${getSortIcon('boss', i)}
+                        </div>
+                    </th>`;
+                });
+                headers += `<th style="cursor:pointer; user-select:none;" onclick="sortMembers('total')">Total ${getSortIcon('total')}</th><th></th>`;
+            } else {
+                const isDead = STATE.deadBosses[2][0];
+                headers += `<th style="cursor:pointer; user-select:none;" onclick="sortMembers('boss', 0)">
+                    <div class="flex flex-col items-center gap-1 group">
+                         <img src="${CONSTANTS.BOSS_IMAGES[4]}" class="w-12 h-12 rounded-xl object-cover border border-stone-200 shadow-sm transition-transform group-hover:scale-105" alt="God of Destruction">
+                         <span class="fill-able text-xs font-bold mt-1" onclick="event.stopPropagation(); quickFill(0)">God of Destruction</span>
+                         <span class="dead-toggle ${isDead ? 'is-dead' : ''}" onclick="event.stopPropagation(); toggleDead(0)">${isDead ? 'DEAD' : 'ALIVE'}</span>
+                         ${getSortIcon('boss', 0)}
+                    </div>
+                 </th><th></th>`;
+            }
+            thead.innerHTML = headers;
+
+            // 2. Body
+            let html = '';
+            const colSum = [0, 0, 0, 0];
+            const dmgSum = [0, 0, 0, 0];
+
+            STATE.members.forEach((m, idx) => {
+                // Filter Logic
+                const term = document.getElementById('searchInput').value.toLowerCase();
+                if (term && !m.name.toLowerCase().includes(term)) return;
+
+                const stats = getMemberStats(m);
+                if (STATE.filter === 'risk' && !stats.isRisk) return;
+
+                let rowClass = stats.isRisk ? 'status-risk' : (stats.isPerfect ? 'status-god' : '');
+
+                // Inputs
+                let inputs = '';
+                if (STATE.page === 1) {
+                    m.v.forEach((val, i) => {
+                        colSum[i] += val;
+                        if (m.d) dmgSum[i] += m.d[i];
+                        const isDead = STATE.deadBosses[1][i];
+
+                        // Switch between damage input and count input
+                        const isDamageMode = STATE.mode === 'damage';
+                        const displayVal = isDamageMode ? (m.d[i] || 0).toLocaleString() : val;
+                        const inputClass = isDamageMode ? 'input-minimal input-damage' : 'input-minimal';
+                        const inputType = isDamageMode ? 'text' : 'number';
+                        const onFocus = isDamageMode ? `onfocus="openDamageHelper(this, ${idx}, ${i})"` : '';
+                        const onBlur = isDamageMode ? `onblur="closeDamageHelper()"` : '';
+
+                        inputs += `<td class="${isDead ? 'cell-dead' : ''}">
+                            <input type="${inputType}" class="${inputClass}" value="${displayVal}" ${onFocus} ${onBlur} onchange="updateVal(${idx}, ${i}, this.value)" placeholder="0">
+                        </td>`;
+                    });
+                } else {
+                    const isDead = STATE.deadBosses[2][0];
+                    colSum[0] += m.v2;
+                    inputs += `<td class="${isDead ? 'cell-dead' : ''}"><input type="number" class="input-minimal" value="${m.v2}" onchange="updateVal(${idx}, -1, this.value)"></td>`;
+                }
+
+                // Total Column Display
+                let totalDisplay = stats.total;
+                if (STATE.page === 1 && STATE.mode === 'damage') {
+                    // Sum damage for display
+                    totalDisplay = (m.d.reduce((a, b) => a + b, 0)).toLocaleString();
+                }
+
+                html += `
+                <tr class="${rowClass}">
+                    <td class="drag-handle cursor-grab text-stone-300"><i class="fas fa-grip-vertical"></i></td>
+                    <td style="text-align:left;">
+                        <div class="member-info">
+                            <span class="member-name" onclick="openProfile(${idx})">${highlightText(m.name, term)}</span>
+                            <span class="text-xs text-yellow-500 ml-1 ${m.note ? 'inline' : 'hidden'}"><i class="fas fa-sticky-note"></i></span>
+                        </div>
+                    </td>
+                    ${inputs}
+                    <td style="font-weight:bold; color:#57534E; font-size:${STATE.mode === 'damage' ? '0.9rem' : '1rem'}">${totalDisplay}</td>
+                    <td><i class="fas fa-trash text-stone-300 hover:text-red-400 cursor-pointer transition-colors" onclick="event.stopPropagation(); delMember(${idx})"></i></td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+
+            // 3. Footer
+            let footer = `<tr><td colspan="2" style="text-align:right; font-weight:bold; padding-right:10px;">TOTAL</td>`;
+            if (STATE.page === 1) {
+                if (STATE.mode === 'damage') {
+                    dmgSum.forEach(s => footer += `<td>${s.toLocaleString()}</td>`);
+                    footer += `<td>${dmgSum.reduce((a, b) => a + b, 0).toLocaleString()}</td><td></td>`;
+                } else {
+                    colSum.forEach(s => footer += `<td>${s}</td>`);
+                    footer += `<td>${colSum.reduce((a, b) => a + b, 0)}</td><td></td>`;
+                }
+            } else {
+                footer += `<td>${colSum[0]}</td><td></td><td></td>`;
+            }
+            footer += `</tr>`;
+            tfoot.innerHTML = footer;
+
+            updateAnalytics();
+        }
+
+        // --- Damage Helper Logic ---
+        let activeInputCtx = null;
+        let helperTimeout = null;
+
+        function openDamageHelper(el, mIdx, bIdx) {
+            activeInputCtx = { el, mIdx, bIdx };
+            const helper = document.getElementById('damage-helper');
+
+            // Position near the input
+            const rect = el.getBoundingClientRect();
+            helper.style.top = (rect.top - 50) + 'px'; // Above the input
+            helper.style.left = (rect.left - 20) + 'px';
+
+            // Adjust if too close to top edge
+            if (rect.top < 60) {
+                helper.style.top = (rect.bottom + 10) + 'px';
+            }
+
+            helper.classList.add('active');
+            if (helperTimeout) clearTimeout(helperTimeout);
+        }
+
+        function closeDamageHelper() {
+            // Delay to allow button click to register
+            helperTimeout = setTimeout(() => {
+                document.getElementById('damage-helper').classList.remove('active');
+                activeInputCtx = null;
+            }, 200);
+        }
+
+        function quickAddDamage(amount, isClear = false) {
+            if (!activeInputCtx) return;
+            const { mIdx, bIdx } = activeInputCtx;
+
+            let currentVal = STATE.members[mIdx].d[bIdx] || 0;
+            let newVal = isClear ? 0 : currentVal + amount;
+
+            updateVal(mIdx, bIdx, newVal);
+        }
+
+        // --- Sorting ---
+        function sortMembers(key, index = -1) {
+            // Logic to toggle order or set new key
+            if (STATE.sort.key === key && STATE.sort.index === index) {
+                STATE.sort.order = STATE.sort.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                STATE.sort.key = key;
+                STATE.sort.index = index;
+                // Default order: Name -> ASC, Numbers -> DESC
+                STATE.sort.order = key === 'name' ? 'asc' : 'desc';
+            }
+
+            STATE.members.sort((a, b) => {
+                let valA, valB;
+
+                if (key === 'name') {
+                    valA = a.name.toLowerCase();
+                    valB = b.name.toLowerCase();
+                } else if (key === 'total') {
+                    if (STATE.page === 1 && STATE.mode === 'damage') {
+                        valA = (a.d || []).reduce((acc, v) => acc + v, 0);
+                        valB = (b.d || []).reduce((acc, v) => acc + v, 0);
+                    } else {
+                        const statsA = getMemberStats(a);
+                        const statsB = getMemberStats(b);
+                        valA = statsA.total;
+                        valB = statsB.total;
+                    }
+                } else if (key === 'boss') {
+                    if (STATE.page === 1) {
+                        const arrA = STATE.mode === 'damage' ? (a.d || [0, 0, 0, 0]) : a.v;
+                        const arrB = STATE.mode === 'damage' ? (b.d || [0, 0, 0, 0]) : b.v;
+                        valA = arrA[index] || 0;
+                        valB = arrB[index] || 0;
+                    } else {
+                        valA = a.v2;
+                        valB = b.v2;
+                    }
+                }
+
+                if (valA < valB) return STATE.sort.order === 'asc' ? -1 : 1;
+                if (valA > valB) return STATE.sort.order === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            saveState('sort');
+            render();
+            showToast(`Sorted by ${key} ${index > -1 ? (index + 1) : ''} (${STATE.sort.order})`, 'success');
+        }
+
+        function getSortIcon(key, index = -1) {
+            if (STATE.sort.key === key && STATE.sort.index === index) {
+                return STATE.sort.order === 'asc' ? '<i class="fas fa-sort-up" style="color:#78716C; vertical-align:middle;"></i>' : '<i class="fas fa-sort-down" style="color:#78716C; vertical-align:middle;"></i>';
+            }
+            return '<i class="fas fa-sort" style="opacity:0.2; font-size:0.8em; margin-left:4px; vertical-align:middle;"></i>';
+        }
+
+        // --- Member Actions ---
+        function updateVal(mIdx, vIdx, val) {
+            // Handle comma-separated strings from input
+            let cleanVal;
+            if (typeof val === 'string') {
+                cleanVal = parseInt(val.replace(/,/g, '')) || 0;
+            } else {
+                cleanVal = parseInt(val) || 0;
+            }
+
+            if (STATE.page === 1) {
+                if (STATE.mode === 'damage') {
+                    STATE.members[mIdx].d[vIdx] = cleanVal;
+                    // Auto-increment logic: if entering damage but count is 0, set count to 1
+                    if (cleanVal > 0 && STATE.members[mIdx].v[vIdx] === 0) {
+                        STATE.members[mIdx].v[vIdx] = 1;
+                        showToast("Auto-tracked 1 attempt", "success");
+                    }
+                } else {
+                    STATE.members[mIdx].v[vIdx] = cleanVal;
+                }
+            } else {
+                STATE.members[mIdx].v2 = cleanVal;
+            }
+            saveState();
+            render();
+        }
+
+        function addMember() {
+            const name = document.getElementById('newMemberName').value.trim();
+            if (name) {
+                STATE.members.push({ name, v: [0, 0, 0, 0], d: [0, 0, 0, 0], v2: 0, note: "" });
+                document.getElementById('newMemberName').value = '';
+                saveState('add');
+                render();
+                showToast("Member Added", "success");
+            }
+        }
+
+        function delMember(idx) {
+            if (confirm("Delete member?")) {
+                STATE.members.splice(idx, 1);
+                saveState('del');
+                render();
+                playTone('delete');
+            }
+        }
+
+        function toggleDead(bossIdx) {
+            STATE.deadBosses[STATE.page][bossIdx] = !STATE.deadBosses[STATE.page][bossIdx];
+            saveState('dead');
+            render();
+        }
+
+        function quickFill(bossIdx) {
+            if (STATE.deadBosses[STATE.page][bossIdx]) return;
+            let promptText = STATE.mode === 'damage'
+                ? `Enter ${STATE.mode} for all members (numbers only, no commas needed):`
+                : `Enter count for all members:`;
+
+            const val = prompt(promptText);
+            if (val !== null) {
+                // Strip commas if pasted
+                const num = parseInt(val.replace(/,/g, '')) || 0;
+
+                STATE.members.forEach(m => {
+                    if (STATE.page === 1) {
+                        if (STATE.mode === 'damage') m.d[bossIdx] = num;
+                        else m.v[bossIdx] = num;
+                    } else {
+                        m.v2 = num;
+                    }
+                });
+                saveState('fill');
+                render();
+                playTone('success');
+            }
+        }
+
+        // --- Features & Utils ---
+        function highlightText(text, term) {
+            if (!term) return text;
+            const regex = new RegExp(`(${term})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function switchPage(p) {
+            STATE.page = p;
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${p}`).classList.add('active');
+            document.getElementById('totalDays').value = p === 1 ? STATE.days1 : STATE.days2;
+            render();
+        }
+
+        function updateGlobalDays() {
+            const val = parseInt(document.getElementById('totalDays').value) || 1;
+            if (STATE.page === 1) STATE.days1 = val; else STATE.days2 = val;
+            saveState();
+            render();
+        }
+
+        function searchMembers() { render(); }
+        function clearSearch() { document.getElementById('searchInput').value = ''; render(); }
+        function toggleCompact() { STATE.compact = !STATE.compact; document.body.classList.toggle('compact-mode'); }
+        function toggleFilter(f) { STATE.filter = STATE.filter === f ? 'all' : f; document.getElementById('btn-filter-risk').classList.toggle('active'); render(); }
+        function toggleMode() { STATE.mode = STATE.mode === 'count' ? 'damage' : 'count'; saveState(); render(); }
+        function resetWeek() {
+            if (!confirm("⚠️ WARNING: WEEKLY RESET\n\nThis will reset ALL attempts and damage to 0 for everyone.\nMember names will be kept.\n\nAre you sure?")) return;
+
+            // Manual Backup before reset
+            const now = new Date().toLocaleString();
+            const currentData = localStorage.getItem('bossGuildData');
+            localStorage.setItem('backup_pre_reset_' + Date.now(), JSON.stringify({ data: currentData, time: now }));
+
+            STATE.members.forEach(m => {
+                m.v = [0, 0, 0, 0];
+                m.d = [0, 0, 0, 0];
+                m.v2 = 0;
+            });
+
+            // Reset dead bosses status
+            STATE.deadBosses = { 1: [false, false, false, false], 2: [false] };
+
+            saveState('reset');
+            render();
+            showToast("Weekly Reset Complete. Backup saved.", "success");
+            playTone('delete');
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            saveState();
+            playTone('pop');
+        }
+
+        function showToast(msg, type = 'info') {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.add('show');
+            playTone(type === 'success' ? 'success' : 'pop');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function toggleSound() { 
+            STATE.soundEnabled = !STATE.soundEnabled; 
+            document.getElementById('btn-sound').innerHTML = STATE.soundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>'; 
+        }
+
+        // --- Settings / Bulk Import ---
+        function toggleSettings() {
+            const modal = document.getElementById('settingsModal');
+            if (!modal.classList.contains('active')) {
+                // Populate current settings
+                document.getElementById('settingMaxHP').value = STATE.config.bossMaxHp;
+                modal.classList.add('active');
+            } else {
+                modal.classList.remove('active');
+            }
+        }
+
+        function saveSettings() {
+            const newHp = parseInt(document.getElementById('settingMaxHP').value);
+            if (!isNaN(newHp) && newHp > 0) {
+                STATE.config.bossMaxHp = newHp;
+                CONSTANTS.BOSS_MAX_HP = newHp;
+                saveState('config');
+                render();
+                closeModal('settingsModal');
+                showToast("Settings Saved", "success");
+            } else {
+                showToast("Invalid HP Value", "danger");
+            }
+        }
+
+        function bulkImportMembers() {
+            const raw = document.getElementById('bulkNames').value;
+            const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+            let count = 0;
+            lines.forEach(name => {
+                if (!STATE.members.find(m => m.name === name)) {
+                    STATE.members.push({ name, v: [0,0,0,0], d: [0,0,0,0], v2: 0, note: "" });
+                    count++;
+                }
+            });
+            saveState('bulkImport');
+            render();
+            closeModal('settingsModal');
+            showToast(`Added ${count} members`, "success");
+            document.getElementById('bulkNames').value = '';
+        }
+
+        // --- Drag & Drop ---
+        function setupDragAndDrop() {
+            let dragCounter = 0;
+            const overlay = document.getElementById('drag-overlay');
+
+            window.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dragCounter++;
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            });
+
+            window.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dragCounter--;
+                if (dragCounter <= 0) {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                    dragCounter = 0;
+                }
+            });
+
+            window.addEventListener('dragover', (e) => e.preventDefault());
+
+            window.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragCounter = 0;
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                     const file = e.dataTransfer.files[0];
+                     if (file.type.startsWith('image/')) {
+                         processOCRFile(file);
+                     }
+                }
+            });
+        }
+
+        // --- OCR Logic ---
+        function triggerOCR() {
+            document.getElementById('ocrInput').click();
+        }
+
+        function handleOCRFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            processOCRFile(file);
+            input.value = '';
+        }
+
+        // Preprocess image to grayscale & increase contrast for better OCR
+        function preprocessImage(file) {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    const cvs = document.createElement('canvas');
+                    const ctx = cvs.getContext('2d');
+
+                    // 1. Upscaling: Tesseract loves larger text
+                    // If image is small (< 1500px width), scale it up
+                    let width = img.width;
+                    let height = img.height;
+                    const targetWidth = 2500; // Increased to 2500 for better Thai vowel detection
+                    if (width < targetWidth) {
+                        const scale = targetWidth / width;
+                        width = Math.round(width * scale);
+                        height = Math.round(height * scale);
+                    }
+
+                    cvs.width = width;
+                    cvs.height = height;
+
+                    // Draw with white background
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.fillRect(0, 0, width, height);
+                    // Use high quality smoothing
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const idata = ctx.getImageData(0, 0, width, height);
+                    const d = idata.data;
+                    const len = d.length;
+
+                    // 2. Grayscale & Analysis
+                    let totalLuminance = 0;
+                    const grayArr = new Uint8Array(len / 4);
+
+                    for (let i = 0; i < len; i += 4) {
+                        // Weighted RGB for human perception of luminance
+                        const g = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+                        grayArr[i / 4] = g;
+                        totalLuminance += g;
+                    }
+
+                    // 3. Auto-Invert Check
+                    // If average luminance is low (< 128), it's likely a dark theme (white text on dark).
+                    // Tesseract prefers black text on white background.
+                    const avgLum = totalLuminance / (len / 4);
+                    const isDarkTheme = avgLum < 128;
+
+                    // 4. Binarization (Otsu's Method)
+                    // Calculate Histogram
+                    const histogram = new Array(256).fill(0);
+                    for (let i = 0; i < grayArr.length; i++) {
+                        histogram[grayArr[i]]++;
+                    }
+
+                    // Calculate Otsu Threshold
+                    let sum = 0;
+                    for (let i = 0; i < 256; i++) sum += i * histogram[i];
+
+                    let sumB = 0;
+                    let wB = 0;
+                    let wF = 0;
+                    let maxVar = 0;
+                    let threshold = 0;
+                    const totalPixels = grayArr.length;
+
+                    for (let t = 0; t < 256; t++) {
+                        wB += histogram[t];
+                        if (wB === 0) continue;
+                        wF = totalPixels - wB;
+                        if (wF === 0) break;
+
+                        sumB += t * histogram[t];
+                        const mB = sumB / wB;
+                        const mF = (sum - sumB) / wF;
+
+                        const varBetween = wB * wF * (mB - mF) * (mB - mF);
+                        if (varBetween > maxVar) {
+                            maxVar = varBetween;
+                            threshold = t;
+                        }
+                    }
+
+                    // Apply Threshold & Invert if necessary
+                    // We want the text to be BLACK (0) and background WHITE (255)
+                    for (let i = 0; i < len; i += 4) {
+                        const g = grayArr[i / 4];
+                        let val;
+
+                        if (isDarkTheme) {
+                            // Dark Theme: Background is Dark (Low G), Text is Light (High G)
+                            // We want Text (High G) -> Black (0)
+                            // We want BG (Low G) -> White (255)
+                            // So if G > Threshold (Text) -> 0, Else -> 255
+                            val = g > threshold ? 0 : 255;
+                        } else {
+                            // Light Theme: Background is Light (High G), Text is Dark (Low G)
+                            // We want Text (Low G) -> Black (0)
+                            // We want BG (High G) -> White (255)
+                            // So if G < Threshold (Text) -> 0, Else -> 255
+                            val = g < threshold ? 0 : 255;
+                        }
+
+                        d[i] = val;
+                        d[i + 1] = val;
+                        d[i + 2] = val;
+                        // Alpha remains 255 (from canvas init) or original
+                    }
+
+                    ctx.putImageData(idata, 0, 0);
+                    cvs.toBlob(resolve);
+                };
+            });
+        }
+
+        let pendingOCRFile = null;
+
+        function processOCRFile(file) {
+            // Determine target boss
+            // Always open modal
+            pendingOCRFile = file;
+            document.getElementById('ocrBossModal').classList.add('active');
+        }
+
+        function selectOCRBoss(idx) {
+            document.getElementById('ocrBossModal').classList.remove('active');
+            if (pendingOCRFile && idx >= 0) {
+                // If idx is 4, it is God of Destruction
+                if (idx === 4) {
+                    runOCR(pendingOCRFile, 0, true);
+                } else {
+                    runOCR(pendingOCRFile, idx, false);
+                }
+                pendingOCRFile = null;
+            }
+        }
+
+        async function runOCR(file, bossIdx, isDestroyer) {
+            // UI References
+            const modal = document.getElementById('ocrProgressModal');
+            const statusText = document.getElementById('ocrStatusText');
+            const progressBar = document.getElementById('ocrProgressBar');
+            const progressPercent = document.getElementById('ocrProgressPercent');
+
+            // Reset UI
+            progressBar.style.width = '0%';
+            progressPercent.innerText = '0%';
+            statusText.innerText = "📷 Preprocessing Image...";
+            modal.classList.add('active');
+
+            try {
+                // 1. Preprocess
+                progressBar.style.width = '10%';
+                progressPercent.innerText = '10%';
+                
+                await new Promise(r => setTimeout(r, 100)); // Small UX delay
+
+                const processedBlob = await preprocessImage(file);
+                
+                progressBar.style.width = '20%';
+                progressPercent.innerText = '20%';
+
+                // 2. Recognize with Progress
+                // Tesseract.recognize call with 'eng+tha' and improved logger
+                const { data: { text } } = await Tesseract.recognize(processedBlob, 'eng+tha', {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            // Map 0-1 to 20%-90%
+                            const p = 20 + (m.progress * 70); 
+                            progressBar.style.width = `${p}%`;
+                            progressPercent.innerText = `${Math.round(p)}%`;
+                            statusText.innerText = "🧠 Recognizing Text...";
+                        } else if (m.status === 'loading tesseract core') {
+                             statusText.innerText = "⬇️ Loading Core...";
+                        } else if (m.status === 'loading language traineddata') {
+                             statusText.innerText = "⬇️ Loading Thai Data..."; 
+                        } else if (m.status === 'initializing api') {
+                             statusText.innerText = "⚙️ Initializing...";
+                        }
+                    }
+                });
+
+                // 3. Parse Logic
+                statusText.innerText = "✅ Matching Data...";
+                progressBar.style.width = '95%';
+                progressPercent.innerText = '95%';
+                
+                await new Promise(r => setTimeout(r, 300)); // Short UX pause to show 95%
+
+                let count = 0;
+                const lines = text.split('\n');
+
+                lines.forEach(line => {
+                    // Enhanced Matching: Normalize by stripping ALL whitespaces
+                    // OCR often adds spaces in Thai: "ส ม ชา ย" -> "สมชาย"
+                    const lineNormalized = line.replace(/\s+/g, '').toLowerCase();
+
+                    STATE.members.forEach((m, mIdx) => {
+                        const nameNormalized = m.name.replace(/\s+/g, '').toLowerCase();
+
+                        if (lineNormalized.includes(nameNormalized)) {
+                            // NEW PARSING LOGIC:
+                            // We need to support formats like: 5,827,181
+                            
+                            const scores = [];
+
+                            // 1. Regex for formatted numbers (1,234 or 1.234 or 1 234)
+                            // Looks for 1-3 digits followed by groups of 3 digits separated by [, . space]
+                            // The (?!\d) lookahead ensures we don't match the start of a longer sequence
+                            const bigNumRegex = /\d{1,3}(?:[,. ]\d{3})+(?!\d)/g;
+                            const bigMatches = line.match(bigNumRegex) || [];
+                            
+                            bigMatches.forEach(m => {
+                                const raw = m.replace(/[^\d]/g, '');
+                                const num = parseInt(raw);
+                                if (!isNaN(num) && num > 1000) scores.push(num);
+                            });
+
+                            // 2. Fallback: Split by wide whitespace and check for simple integers
+                            // This covers cases where numbers aren't formatted or OCR removed separators
+                            const parts = line.split(/\s+/);
+                            parts.forEach(p => {
+                                // Remove trailing/leading punctuation
+                                const cleanP = p.replace(/^[,.]+|[,.]+$/g, '');
+                                // If it is a clean integer
+                                const raw = cleanP.replace(/[^\d]/g, '');
+                                if (raw.length > 0 && cleanP.match(/^\d+$/)) {
+                                     const num = parseInt(raw);
+                                     if (!isNaN(num) && num > 1000) scores.push(num);
+                                }
+                            });
+
+                            if (scores.length > 0) {
+                                // Assume score is the largest number found > 1000
+                                const maxScore = Math.max(...scores);
+
+                                if (isDestroyer) {
+                                    STATE.members[mIdx].v2 = maxScore;
+                                } else {
+                                    STATE.members[mIdx].d[bossIdx] = maxScore;
+                                    // Auto update count if 0
+                                    if (STATE.members[mIdx].v[bossIdx] === 0) STATE.members[mIdx].v[bossIdx] = 1;
+                                }
+                                count++;
+                            }
+                        }
+                    });
+                });
+
+                modal.classList.remove('active');
+                saveState('ocr');
+                render();
+                showToast(`OCR Complete: Updated ${count} records`, "success");
+                playTone('success');
+
+            } catch (e) {
+                console.error(e);
+                modal.classList.remove('active');
+                showToast("OCR Failed: " + e.message, "danger");
+            }
+        }
+
+        // --- Modal Logic ---
+        function openProfile(idx) {
+            STATE.selectedMember = idx;
+            const m = STATE.members[idx];
+            document.getElementById('profile-name').innerText = m.name;
+            document.getElementById('profile-avatar').innerText = m.name.charAt(0).toUpperCase();
+            document.getElementById('profile-note').value = m.note || "";
+
+            const stats = getMemberStats(m);
+            const days = STATE.page === 1 ? STATE.days1 : STATE.days2;
+            const completion = (stats.total / days * 100).toFixed(0);
+            document.getElementById('profile-daily').innerText = (stats.total / days).toFixed(1);
+            document.getElementById('profile-completion').innerText = `${completion}%`;
+
+            let statsHtml = '';
+            const radarData = [];
+            if (STATE.page === 1) {
+                CONSTANTS.BOSS_NAMES.forEach((b, i) => {
+                    statsHtml += `<div class="flex justify-between border-b border-stone-100 dark:border-stone-700 py-2"><span>${b}</span><span>${m.v[i]}</span></div>`;
+                    radarData.push(m.v[i]);
+                });
+            } else {
+                statsHtml += `<div class="flex justify-between border-b border-stone-100 dark:border-stone-700 py-2"><span>God of Destruction</span><span>${m.v2}</span></div>`;
+                radarData.push(m.v2);
+            }
+            document.getElementById('profile-stats').innerHTML = statsHtml;
+
+            const ctx = document.getElementById('profileRadarChart').getContext('2d');
+            if (STATE.radarChart) STATE.radarChart.destroy();
+            STATE.radarChart = new Chart(ctx, {
+                type: STATE.page === 1 ? 'radar' : 'bar',
+                data: {
+                    labels: STATE.page === 1 ? CONSTANTS.BOSS_NAMES : ['God of Destruction'],
+                    datasets: [{ label: 'Performance', data: radarData, backgroundColor: 'rgba(120, 113, 108, 0.2)', borderColor: '#78716C', borderWidth: 2 }]
+                },
+                options: {
+                    scales: STATE.page === 1 ? { r: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } } } : {},
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function saveProfileNote() {
+            if (STATE.selectedMember !== null) {
+                STATE.members[STATE.selectedMember].note = document.getElementById('profile-note').value;
+                saveState(); render(); closeModal('profileModal');
+                playTone('success');
+            }
+        }
+
+        function openExportModal() {
+            document.getElementById('exportModal').classList.add('active');
+            document.getElementById('qrcode').innerHTML = '';
+            new QRCode(document.getElementById("qrcode"), { text: window.location.href, width: 100, height: 100 });
+        }
+        function toggleShortcuts() { document.getElementById('shortcutsModal').classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // --- Export Logic ---
+        function generateShareLink() {
+            const dataStr = btoa(unescape(encodeURIComponent(JSON.stringify({ members: STATE.members, days1: STATE.days1, days2: STATE.days2, deadBosses: STATE.deadBosses }))));
+            const url = `${window.location.origin}${window.location.pathname}?data=${dataStr}`;
+            navigator.clipboard.writeText(url).then(() => showToast("Link Copied!", "success"));
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('bossGuildData'));
+            const link = document.createElement('a');
+            link.setAttribute("href", dataStr);
+            link.setAttribute("download", "bossguild_backup.json");
+            link.click();
+        }
+
+        function triggerImportJSON() { document.getElementById('jsonImportInput').click(); }
+        function handleJSONImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    importData(JSON.parse(e.target.result));
+                    showToast("Restore Successful", "success");
+                } catch (err) { showToast("Invalid File", "danger"); }
+            };
+            reader.readAsText(file);
+        }
+
+        function triggerImportCSV() { document.getElementById('csvImportInput').click(); }
+
+        function handleCSVImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+                let startIndex = 0;
+                if (lines[0].toLowerCase().includes('name')) startIndex = 1;
+
+                let count = 0;
+                for (let i = startIndex; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    const parts = line.split(',');
+                    if (parts.length < 2) continue;
+
+                    const name = parts[0].trim();
+                    let member = STATE.members.find(m => m.name === name);
+                    if (!member) {
+                        member = { name: name, v: [0, 0, 0, 0], d: [0, 0, 0, 0], v2: 0, note: "" };
+                        STATE.members.push(member);
+                    }
+
+                    if (parts.length >= 6) {
+                        for (let j = 0; j < 4; j++) {
+                            const val = parseInt(parts[j + 1]);
+                            if (!isNaN(val)) member.v[j] = val;
+                        }
+                    } else if (parts.length >= 2) {
+                        const val = parseInt(parts[1]);
+                        if (!isNaN(val)) member.v2 = val;
+                    }
+                    count++;
+                }
+                saveState('importCSV');
+                render();
+                showToast(`Imported ${count} records`, "success");
+                closeModal('exportModal');
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(20);
+            doc.text("BossGuild Report", 10, 20);
+            doc.setFontSize(12);
+            let y = 30;
+            STATE.members.forEach(m => {
+                const stats = getMemberStats(m);
+                doc.text(`${m.name}: ${stats.total} (Note: ${m.note})`, 10, y);
+                y += 10;
+                if(y > 280) { doc.addPage(); y = 10; }
+            });
+            doc.save("report.pdf");
+            showToast("PDF Downloaded", "success");
+        }
+        
+        // Export CSV Function
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            if(STATE.page === 1) {
+                csvContent += "Name,Boss1,Boss2,Boss3,Boss4,Total\n";
+                STATE.members.forEach(function(m) {
+                    let row = `${m.name},${m.v[0]},${m.v[1]},${m.v[2]},${m.v[3]},${m.v.reduce((a,b)=>a+b,0)}`;
+                    csvContent += row + "\n";
+                });
+            } else {
+                csvContent += "Name,God of Destruction\n";
+                STATE.members.forEach(function(m) {
+                    csvContent += `${m.name},${m.v2}\n`;
+                });
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "bossguild_data.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("CSV Downloaded", "success");
+        }
+
+        async function exportImage(type) {
+            closeModal('exportModal');
+            showToast('Generating...', 'info');
+            await new Promise(r => setTimeout(r, 500)); // Wait for modal animation
+
+            let element;
+            let options = {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: null 
+            };
+
+            if (type === 'story') {
+                // Logic for IG Story export
+                const storyEl = document.getElementById('story-export');
+                storyEl.style.top = '0';
+                storyEl.style.left = '0';
+                
+                // Populate story data
+                const days = STATE.page === 1 ? STATE.days1 : STATE.days2;
+                let grandTotal = 0;
+                let max = -1;
+                let mvp = '-';
+                
+                STATE.members.forEach(m => {
+                   const s = getMemberStats(m);
+                   grandTotal += s.total;
+                   if(s.total > max) { max = s.total; mvp = m.name; }
+                });
+                
+                document.getElementById('story-wood').innerText = grandTotal;
+                document.getElementById('story-mvp').innerText = mvp;
+                
+                // Draw Chart
+                const ctx = document.getElementById('storyChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Done', 'Left'],
+                        datasets: [{ data: [grandTotal, (STATE.members.length * days) - grandTotal], backgroundColor: ['#57534E', '#E7E5E4'], borderWidth: 0 }]
+                    },
+                    options: { cutout: '80%', plugins: { legend: { display: false } }, animation: false }
+                });
+                
+                element = storyEl;
+            } else {
+                element = document.querySelector('#main-container'); // Capture main container
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                options.backgroundColor = isDark ? '#1C1917' : '#FDFCF8';
+            }
+
+            html2canvas(element, options).then(canvas => {
+                download(canvas, `BossGuild_${type}.png`);
+                
+                // Cleanup Story
+                if(type === 'story') {
+                    const storyEl = document.getElementById('story-export');
+                    storyEl.style.top = '-9999px';
+                    storyEl.style.left = '-9999px';
+                }
+            }).catch(err => {
+                console.error(err);
+                showToast('Export Failed', 'danger');
+            });
+        }
+
+        function download(canvas, name) {
+            const link = document.createElement('a');
+            link.download = name;
+            link.href = canvas.toDataURL("image/png");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Downloaded!', 'success');
+            playTone('success');
+        }
+
+        function copyTextReport() {
+            const days = STATE.page === 1 ? STATE.days1 : STATE.days2;
+            let text = `*Guild Report*\nTarget: ${days} Attempts\n\n*Missing:*`;
+            STATE.members.forEach(m => {
+                const stats = getMemberStats(m);
+                if (stats.total < days) text += `\n- ${m.name} (${stats.total}/${days})`;
+            });
+            navigator.clipboard.writeText(text).then(() => showToast("Copied to Clipboard", "success"));
+        }
+
+        // --- Chart Init ---
+        function initCharts() {
+            const ctx = document.getElementById('woodChart').getContext('2d');
+            STATE.chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Used', 'Remaining'],
+                    datasets: [{ data: [0, 100], backgroundColor: ['#57534E', '#E7E5E4'], borderWidth: 0, hoverOffset: 10 }]
+                },
+                options: { cutout: '85%', plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+            });
+
+            const barCtx = document.getElementById('bossBarChart').getContext('2d');
+            STATE.barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: CONSTANTS.BOSS_NAMES,
+                    datasets: [{ label: 'Damage', data: [0, 0, 0, 0], backgroundColor: '#A8A29E', borderRadius: 4 }]
+                },
+                options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
+            });
+        }
+
+        // --- Shortcuts ---
+        function setupShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '?' && !e.ctrlKey) toggleShortcuts();
+                if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveState(); showToast("Saved!", "success"); }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                    // Handled by paste event
+                }
+                if (e.key === 'Escape') document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            });
+
+            // Add paste listener for images
+            document.addEventListener('paste', (e) => {
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (let index in items) {
+                    const item = items[index];
+                    if (item.kind === 'file' && item.type.includes('image/')) {
+                        const blob = item.getAsFile();
+                        processOCRFile(blob);
+                        e.preventDefault(); 
+                        break;
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
