@@ -107,14 +107,17 @@
             --text-xl: 1.25rem;
             --text-2xl: 1.5rem;
 
-            /* Kanso Colors */
+            /* Kanso Colors - REFACTORED */
             --kanso-bg: #F9F8F6;
             --kanso-surface: #EFECE5;
             --kanso-text: #34302D;
             --kanso-muted: #898481;
             --kanso-border: rgba(52, 48, 45, 0.08);
-            --clay-accent: #CC6E43;
-            --clay-light: #D98661;
+
+            /* Accent: Clay/Terracotta */
+            --clay-400: #D98661;
+            --clay-500: #CC6E43;
+            --clay-600: #B85A32;
 
             /* Shadows */
             --shadow-sm: 0 4px 12px -4px rgba(60, 50, 40, 0.08);
@@ -123,7 +126,6 @@
 
             /* Animation */
             --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         [data-theme="dark"] {
@@ -418,7 +420,7 @@
 
         .input-minimal:focus {
             background: #FFFFFF;
-            border-color: var(--clay-accent);
+            border-color: var(--clay-500);
             outline: 2px solid rgba(204, 110, 67, 0.15);
             outline-offset: 2px;
             box-shadow: 0 0 0 4px rgba(204, 110, 67, 0.08);
@@ -437,7 +439,7 @@
 
         [data-theme="dark"] .input-minimal:focus {
             background: #252525;
-            border-color: var(--clay-light);
+            border-color: var(--clay-400);
             outline: 2px solid rgba(217, 134, 97, 0.15);
             box-shadow: 0 0 0 4px rgba(217, 134, 97, 0.08);
         }
@@ -502,10 +504,13 @@
             box-shadow: 0 4px 12px -4px rgba(60, 50, 40, 0.08);
             transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
             animation: slideIn 0.3s ease-out forwards;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            /* Visual spacing via separate border-spacing */
         }
 
         [data-theme="dark"] tbody tr {
-            background: #1F1F1F;
+            background: #1A1A1A;
             border: 1px solid #2A2A2A;
         }
 
@@ -563,9 +568,21 @@
             position: sticky;
             left: 0;
             z-index: 21;
-            background-color: inherit;
+            background-color: var(--kanso-bg);
+            /* Match body bg for visual gap */
             min-width: 32px;
             max-width: 32px;
+        }
+
+        /* Sticky needs background from TR to not be transparent */
+        tbody tr td:nth-child(1) {
+            background-color: #FFFFFF;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        [data-theme="dark"] tbody tr td:nth-child(1) {
+            background-color: #1A1A1A;
         }
 
         /* Column 2: Member name - Wider sticky */
@@ -578,6 +595,15 @@
             border-right: 1px solid var(--kanso-border);
             min-width: 120px;
             max-width: 160px;
+        }
+
+        /* Fix sticky overlap transparency */
+        tbody tr td:nth-child(2) {
+            background-color: #FFFFFF;
+        }
+
+        [data-theme="dark"] tbody tr td:nth-child(2) {
+            background-color: #1A1A1A;
         }
 
         /* Shadow indicator when scrolled */
@@ -1301,6 +1327,202 @@
             font-weight: 500;
             letter-spacing: -0.02em;
         }
+
+        /* ====================================
+           UI ENRICHMENT (Dashboard Cards, Watermark, Footer)
+           ==================================== */
+        .dashboard-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+            /* Stronger shadow for depth */
+            border: 1px solid rgba(52, 48, 45, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Subtle lift on hover */
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+        }
+
+        [data-theme="dark"] .dashboard-card {
+            background: #1A1A1A;
+            border-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        .watermark-decoration {
+            position: fixed;
+            bottom: -40px;
+            right: -40px;
+            width: 500px;
+            /* Large */
+            height: 500px;
+            opacity: 0.03;
+            pointer-events: none;
+            color: #57534E;
+            z-index: 0;
+            transform: rotate(-10deg);
+        }
+
+        [data-theme="dark"] .watermark-decoration {
+            color: #E7E5E4;
+            opacity: 0.02;
+        }
+
+        .app-footer {
+            text-align: center;
+            padding: 3rem 0 4rem;
+            /* More space at bottom */
+            color: #a8a29e;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        /* ====================================
+           IG STORY EXPORT (Premium Redesign)
+           ==================================== */
+        #story-export {
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(135deg, #FDFCF8 0%, #E7E5E4 100%);
+            z-index: 9999;
+            display: flex;
+            /* Flexbox for centering */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Prompt', sans-serif;
+            color: #34302D;
+            overflow: hidden;
+            /* Clip decorations */
+        }
+
+        /* Noise Overlay for Story */
+        #story-export::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Decoration Circle */
+        .story-deco-circle {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(217, 134, 97, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+            z-index: 0;
+        }
+
+        /* Glass Card */
+        .story-card {
+            position: relative;
+            z-index: 10;
+            width: 900px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 40px 80px -20px rgba(60, 50, 40, 0.15);
+            padding: 80px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .story-header {
+            text-align: center;
+        }
+
+        .story-title {
+            font-family: 'Playfair Display', serif;
+            /* Or system serif */
+            font-size: 3rem;
+            letter-spacing: 0.05em;
+            color: #78716C;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .story-main-title {
+            font-size: 5rem;
+            font-weight: 800;
+            color: #44403C;
+            line-height: 1;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        /* Stats Grid */
+        .story-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+        }
+
+        .story-stat-item {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .story-label {
+            font-size: 1.5rem;
+            color: #A8A29E;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .story-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #44403C;
+            line-height: 1.1;
+        }
+
+        .story-value-sm {
+            font-size: 2.2rem;
+            /* Smaller font for long names */
+        }
+
+        .story-accent {
+            color: #D97706;
+        }
+
+        .story-footer {
+            margin-top: auto;
+            font-size: 1.5rem;
+            color: #A8A29E;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            position: absolute;
+            bottom: 60px;
+            z-index: 10;
+        }
     </style>
 </head>
 
@@ -1379,20 +1601,37 @@
         </div>
 
         <!-- Dashboard -->
+        <!-- Dashboard -->
         <div class="glass-panel p-6 mb-8" id="dashboard-panel">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
 
-                <!-- Chart 1 -->
-                <div class="relative h-64 flex items-center justify-center">
-                    <canvas id="woodChart"></canvas>
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span id="chart-percent"
-                            class="font-serif text-5xl font-medium text-stone-800 dark:text-stone-100">0%</span>
+            <!-- Guild Progress Bar -->
+            <div class="mb-8">
+                <div class="flex justify-between items-end mb-2">
+                    <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest">Guild Progress</h4>
+                    <span class="text-xs font-bold text-stone-500 dark:text-stone-400" id="progress-text">0%</span>
+                </div>
+                <div class="w-full bg-stone-100 dark:bg-stone-700/50 rounded-full h-3 overflow-hidden">
+                    <div id="guild-progress-bar"
+                        class="bg-indigo-500 h-full rounded-full transition-all duration-1000 ease-out"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+
+                <!-- Card 1: Donut Visualization -->
+                <div class="dashboard-card flex flex-col items-center justify-center p-6 relative">
+                    <div class="relative h-48 w-48 flex items-center justify-center">
+                        <canvas id="woodChart"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span id="chart-percent"
+                                class="font-serif text-4xl font-medium text-stone-800 dark:text-stone-100">0%</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Metrics Column -->
-                <div class="flex flex-col gap-3 justify-center">
+                <!-- Card 2: Key Metrics -->
+                <div class="dashboard-card p-6 flex flex-col justify-center gap-4">
                     <!-- Row 1: Total -->
                     <div class="metric-card">
                         <div class="metric-icon"><i class="fas fa-bullseye"></i></div>
@@ -1405,45 +1644,50 @@
 
                     <!-- Row 2: Completed / Remaining -->
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="metric-card metric-used p-3 gap-2 flex-col items-start">
+                        <div class="metric-card metric-used p-3 gap-2 flex-col items-start h-full">
                             <div class="flex items-center gap-2 w-full">
-                                <div class="metric-icon w-9 h-9 text-sm flex-shrink-0"><i class="fas fa-check"></i>
+                                <div class="metric-icon w-8 h-8 text-xs flex-shrink-0"><i class="fas fa-check"></i>
                                 </div>
-                                <h4 class="text-[11px] font-bold text-stone-400 uppercase tracking-wide">
-                                    Completed</h4>
+                                <h4 class="text-[10px] font-bold text-stone-400 uppercase tracking-wide">
+                                    Done</h4>
                             </div>
-                            <p class="text-xl font-semibold value leading-none" id="used-attempts">0</p>
+                            <p class="text-lg font-semibold value leading-none mt-auto" id="used-attempts">0</p>
                         </div>
-                        <div class="metric-card metric-remain p-3 gap-2 flex-col items-start">
+                        <div class="metric-card metric-remain p-3 gap-2 flex-col items-start h-full">
                             <div class="flex items-center gap-2 w-full">
-                                <div class="metric-icon w-9 h-9 text-sm flex-shrink-0"><i class="fas fa-clock"></i>
+                                <div class="metric-icon w-8 h-8 text-xs flex-shrink-0"><i class="fas fa-clock"></i>
                                 </div>
-                                <h4 class="text-[11px] font-bold text-stone-400 uppercase tracking-wide">
-                                    Remaining</h4>
+                                <h4 class="text-[10px] font-bold text-stone-400 uppercase tracking-wide">
+                                    Left</h4>
                             </div>
-                            <p class="text-xl font-semibold value leading-none" id="remaining-attempts">0</p>
+                            <p class="text-lg font-semibold value leading-none mt-auto" id="remaining-attempts">0</p>
                         </div>
                     </div>
 
                     <!-- Row 3: Avg / Missing -->
                     <div class="grid grid-cols-2 gap-3">
                         <div
-                            class="bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 rounded-2xl p-4 text-center">
-                            <div class="text-stone-400 text-xs font-medium uppercase tracking-wider mb-1">Daily Avg
+                            class="bg-stone-50 dark:bg-stone-800/50 border border-stone-100 dark:border-stone-700/50 rounded-xl p-3 text-center">
+                            <div class="text-stone-400 text-[10px] font-medium uppercase tracking-wider mb-1">Daily Avg
                             </div>
-                            <div class="text-xl font-bold text-stone-700 dark:text-stone-200" id="daily-avg">0</div>
+                            <div class="text-lg font-bold text-stone-700 dark:text-stone-200" id="daily-avg">0</div>
                         </div>
                         <div
-                            class="bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 rounded-2xl p-4 text-center">
-                            <div class="text-stone-400 text-xs font-medium uppercase tracking-wider mb-1">Missing</div>
+                            class="bg-stone-50 dark:bg-stone-800/50 border border-stone-100 dark:border-stone-700/50 rounded-xl p-3 text-center">
+                            <div class="text-stone-400 text-[10px] font-medium uppercase tracking-wider mb-1">Missing
+                            </div>
                             <div class="text-lg font-bold text-stone-700 dark:text-stone-200" id="missing-count">0</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Chart 2 -->
-                <div class="h-48 flex items-center justify-center relative">
-                    <canvas id="bossBarChart"></canvas>
+                <!-- Card 3: Boss Breakdown -->
+                <div class="dashboard-card p-6 flex flex-col relative h-full min-h-[300px]">
+                    <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4 absolute top-6 left-6">
+                        Boss Breakdown</h4>
+                    <div class="flex-1 flex items-center justify-center mt-6">
+                        <canvas id="bossBarChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1479,6 +1723,10 @@
                     aria-label="Filter at-risk members"><i class="fas fa-filter"></i> Risk</button>
                 <button class="tool-btn" onclick="triggerOCR()" title="Scan Image" aria-label="Scan image with OCR"><i
                         class="fas fa-camera"></i></button>
+
+                <!-- Discord Button -->
+                <button class="tool-btn text-white bg-[#5865F2] hover:bg-[#4752C4]" onclick="sendToDiscord()"
+                    aria-label="Send to Discord"><i class="fab fa-discord"></i></button>
 
                 <div class="divider"></div>
 
@@ -1640,6 +1888,20 @@
                         <p class="text-xs text-stone-400">From JSON</p>
                     </div>
                 </div>
+                <div class="export-option" onclick="exportCSV()">
+                    <div class="export-icon"><i class="fas fa-file-csv"></i></div>
+                    <div>
+                        <h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Export CSV</h4>
+                        <p class="text-xs text-stone-400">Excel Compatible</p>
+                    </div>
+                </div>
+                <div class="export-option" onclick="triggerImportCSV()">
+                    <div class="export-icon"><i class="fas fa-file-import"></i></div>
+                    <div>
+                        <h4 class="font-semibold text-stone-700 dark:text-stone-200 text-sm">Import CSV</h4>
+                        <p class="text-xs text-stone-400">Smart Merge</p>
+                    </div>
+                </div>
             </div>
 
             <!-- History Section -->
@@ -1700,9 +1962,16 @@
                     class="w-full bg-stone-50 dark:bg-stone-800 border border-transparent rounded-xl p-3 text-sm dark:text-stone-200 focus:bg-white dark:focus:bg-stone-700 focus:border-stone-200 focus:outline-none transition-all"></textarea>
             </div>
 
-            <button
-                class="w-full mt-6 bg-stone-800 text-white py-3 rounded-xl font-medium hover:bg-stone-700 transition-colors"
-                onclick="saveProfileNote()">Save Details</button>
+            <div class="flex gap-3 mt-6">
+                <button
+                    class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-3 rounded-xl font-medium hover:bg-stone-300 dark:hover:bg-stone-600 transition-colors flex items-center justify-center gap-2"
+                    onclick="triggerTargetedOCR(STATE.selectedMember)">
+                    <i class="fas fa-camera"></i> Scan Score
+                </button>
+                <button
+                    class="flex-1 bg-stone-800 text-white py-3 rounded-xl font-medium hover:bg-stone-700 transition-colors"
+                    onclick="saveProfileNote()">Save Details</button>
+            </div>
         </div>
     </div>
 
@@ -1762,6 +2031,14 @@
                     <input type="text" id="settingOCRKeywords"
                         class="w-full bg-stone-50 dark:bg-stone-800 border border-transparent rounded-xl p-3 text-sm dark:text-stone-200 focus:bg-white dark:focus:bg-stone-700 focus:border-stone-200 focus:outline-none transition-all"
                         placeholder="e.g. à¸—à¹‰à¸²à¸—à¸²à¸¢, à¸„à¸£à¸±à¹‰à¸‡, Attack, Times">
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Discord Webhook
+                        URL</label>
+                    <input type="text" id="settingDiscordWebhook"
+                        class="w-full bg-stone-50 dark:bg-stone-800 border border-transparent rounded-xl p-3 text-sm dark:text-stone-200 focus:bg-white dark:focus:bg-stone-700 focus:border-stone-200 focus:outline-none transition-all"
+                        placeholder="https://discord.com/api/webhooks/...">
                 </div>
 
                 <div class="border-t border-stone-100 dark:border-stone-700 pt-6">
@@ -1829,14 +2106,54 @@
     </div>
 
     <!-- Hidden IG Story Export Layout -->
+    <!-- Hidden IG Story Export Layout (Premium 1080x1920) -->
     <div id="story-export">
-        <h1 style="font-size: 6rem; margin-bottom: 20px; font-weight:800; color: #44403C;">BossGuild</h1>
-        <h2 style="font-size: 3rem; opacity: 0.8; margin-bottom: 100px; color: #78716C;">WEEKLY SUMMARY</h2>
-        <div style="width: 600px; height: 600px; margin-bottom: 100px;"><canvas id="storyChart"></canvas></div>
-        <div style="font-size: 3rem; text-align: center; color: #44403C;">
-            <p style="margin-bottom: 20px;">Total Attempts <strong style="color:#57534E" id="story-wood">0</strong></p>
-            <p>MVP <strong style="color:#d97706" id="story-mvp">-</strong></p>
+        <div class="story-deco-circle"></div>
+
+        <div class="story-card">
+            <div class="story-header">
+                <div class="story-title">Weekly Summary</div>
+                <h1 class="story-main-title">BossGuild</h1>
+                <div class="story-title" style="font-size: 1.5rem; margin-top: 10px; opacity: 0.6;">IDLE RPG TRACKER
+                </div>
+            </div>
+
+            <div style="width: 500px; height: 500px; position: relative;">
+                <canvas id="storyChart"></canvas>
+                <!-- Center Label for Chart -->
+                <div
+                    style="position: absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; pointer-events:none;">
+                    <span style="font-size: 5rem; font-weight:700; color:#44403C;" id="story-chart-label">0%</span>
+                    <span
+                        style="font-size: 1.2rem; color:#A8A29E; letter-spacing:0.1em; text-transform:uppercase;">Complete</span>
+                </div>
+            </div>
+
+            <div class="story-stats-grid">
+                <!-- Stat 1 -->
+                <div class="story-stat-item">
+                    <div class="story-label">Total Attempts</div>
+                    <div class="story-value" id="story-wood">0</div>
+                </div>
+                <!-- Stat 2 -->
+                <div class="story-stat-item">
+                    <div class="story-label">MVP</div>
+                    <div class="story-value story-value-sm story-accent" id="story-mvp">-</div>
+                </div>
+                <!-- Stat 3 (New) -->
+                <div class="story-stat-item">
+                    <div class="story-label">Top Damage</div>
+                    <div class="story-value story-value-sm" id="story-top-dmg">0</div>
+                </div>
+                <!-- Stat 4 (New) -->
+                <div class="story-stat-item">
+                    <div class="story-label">Active Users</div>
+                    <div class="story-value story-accent" id="story-active-count">0</div>
+                </div>
+            </div>
         </div>
+
+        <div class="story-footer">Generated by BossGuild 2.0</div>
     </div>
 
     <script>
@@ -2204,6 +2521,7 @@
                     bossMaxHp: (typeof data.config?.bossMaxHp === 'number' && data.config.bossMaxHp > 0)
                         ? data.config.bossMaxHp : 100000000,
                     ocrKeywords: data.config?.ocrKeywords || "ท้าทาย, โจมตี, ตี, รอบ, ครั้ง, Attack, Times",
+                    discordWebhook: data.config?.discordWebhook || "", // Fix: Load Webhook
                     tiers: validateTierConfig(data.config?.tiers)
                 };
                 STATE.archives = data.archives || [];
@@ -2382,6 +2700,12 @@
             const totalPossible = days * STATE.members.length;
             const percent = totalPossible > 0 ? Math.min(100, (grandTotal / totalPossible * 100)).toFixed(1) : 0;
 
+            // Update Guild Progress Bar
+            const progressBar = document.getElementById('guild-progress-bar');
+            const progressText = document.getElementById('progress-text');
+            if (progressBar) progressBar.style.width = `${percent}%`;
+            if (progressText) progressText.innerText = `${percent}%`;
+
             // Confetti Trigger
             const percentVal = parseFloat(percent);
             if (percentVal >= 100 && !STATE.goalReached) {
@@ -2545,13 +2869,13 @@
                         const onBlur = isDamageMode ? `onblur="closeDamageHelper()"` : '';
 
                         inputs += `<td class="${isDead ? 'cell-dead' : ''}">
-                            <input type="${inputType}" class="${inputClass}" value="${displayVal}" ${onFocus} ${onBlur} onchange="updateVal(${idx}, ${i}, this.value)" placeholder="0">
+                            <input type="${inputType}" class="${inputClass}" value="${displayVal}" ${onFocus} ${onBlur} oninput="updateVal(${idx}, ${i}, this.value)" placeholder="0">
                         </td>`;
                     });
                 } else {
                     const isDead = STATE.deadBosses[2][0];
                     colSum[0] += m.v2;
-                    inputs += `<td class="${isDead ? 'cell-dead' : ''}"><input type="number" class="input-minimal" value="${m.v2}" onchange="updateVal(${idx}, -1, this.value)"></td>`;
+                    inputs += `<td class="${isDead ? 'cell-dead' : ''}"><input type="number" class="input-minimal" value="${m.v2}" oninput="updateVal(${idx}, -1, this.value)"></td>`;
                 }
 
                 let totalDisplay = stats.total;
@@ -2564,14 +2888,14 @@
                     <td class="drag-handle cursor-grab text-stone-300"><i class="fas fa-grip-vertical"></i></td>
                     <td style="text-align:left;">
                         <div class="member-info">
-                            <span class="tier-badge ${tier.class}">${tier.label}</span>
+                            <span id="tier-${idx}" class="tier-badge ${tier.class}">${tier.label}</span>
                             <span class="member-name inline align-middle" onclick="openProfile(${idx})">${highlightText(m.name, term)}</span>
                             <i class="fas fa-pen text-stone-300 hover:text-stone-600 cursor-pointer ml-1 text-[10px] opacity-30 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); renameMember(${idx})" title="Rename"></i>
                             <span class="text-xs text-yellow-500 ml-1 ${m.note ? 'inline' : 'hidden'}"><i class="fas fa-sticky-note"></i></span>
                         </div>
                     </td>
                     ${inputs}
-                    <td class="font-serif-num" style="font-weight:bold; color:#57534E; font-size:${STATE.mode === 'damage' ? '0.9rem' : '1.1rem'}">${totalDisplay}</td>
+                    <td id="total-${idx}" class="font-serif-num" style="font-weight:bold; color:#57534E; font-size:${STATE.mode === 'damage' ? '0.9rem' : '1.1rem'}">${totalDisplay}</td>
                     <td><i class="fas fa-trash text-stone-300 hover:text-red-400 cursor-pointer transition-colors" onclick="event.stopPropagation(); delMember(${idx})"></i></td>
                 </tr>`;
             });
@@ -2688,6 +3012,33 @@
             return '<i class="fas fa-sort" style="opacity:0.2; font-size:0.8em; margin-left:4px; vertical-align:middle;"></i>';
         }
 
+        // --- Helper: Update Row Total Instantly ---
+        function updateRowTotal(mIdx) {
+            const m = STATE.members[mIdx];
+
+            // 1. Calculate New Total
+            let totalDisplay = 0;
+            if (STATE.page === 1 && STATE.mode === 'damage') {
+                totalDisplay = (m.d || []).reduce((a, b) => a + b, 0).toLocaleString();
+            } else if (STATE.page === 1) {
+                totalDisplay = (m.v || []).reduce((a, b) => a + b, 0);
+            } else {
+                totalDisplay = m.v2;
+            }
+
+            // 2. Update Total Cell (DOM)
+            const totalCell = document.getElementById(`total-${mIdx}`);
+            if (totalCell) totalCell.innerText = totalDisplay;
+
+            // 3. Update Tier Badge (DOM)
+            const tierBadge = document.getElementById(`tier-${mIdx}`);
+            if (tierBadge) {
+                const tier = calculateTier(m);
+                tierBadge.className = `tier-badge ${tier.class}`;
+                tierBadge.innerText = tier.label;
+            }
+        }
+
         // --- Member Actions ---
         let saveTimeout = null;
 
@@ -2696,9 +3047,11 @@
             const maxVal = STATE.mode === 'damage' ? 999999999 : CONFIG.MAX_COUNT;
             const cleanVal = parseNumericInput(val, 0, maxVal);
 
+            // 1. IMMEDIATE STATE UPDATE
             if (STATE.page === 1) {
                 if (STATE.mode === 'damage') {
                     STATE.members[mIdx].d[vIdx] = cleanVal;
+                    // Auto-track attempt logic
                     if (cleanVal > 0 && STATE.members[mIdx].v[vIdx] === 0) {
                         STATE.members[mIdx].v[vIdx] = 1;
                         showToast("Auto-tracked 1 attempt", "success");
@@ -2710,7 +3063,10 @@
                 STATE.members[mIdx].v2 = cleanVal;
             }
 
-            // Debounced save for performance (don't full re-render on every keystroke)
+            // 2. IMMEDIATE DOM UPDATE (Total & Tier)
+            updateRowTotal(mIdx);
+
+            // 3. DEBOUNCED SAVE & ANALYTICS
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
                 saveState('update');
@@ -2827,6 +3183,7 @@
             if (!modal.classList.contains('active')) {
                 document.getElementById('settingMaxHP').value = STATE.config.bossMaxHp;
                 document.getElementById('settingOCRKeywords').value = STATE.config.ocrKeywords;
+                document.getElementById('settingDiscordWebhook').value = STATE.config.discordWebhook || ""; // Load Webhook
                 document.getElementById('tierS').value = STATE.config.tiers.s;
                 document.getElementById('tierA').value = STATE.config.tiers.a;
                 document.getElementById('tierB').value = STATE.config.tiers.b;
@@ -2841,6 +3198,7 @@
         function saveSettings() {
             const newHp = parseInt(document.getElementById('settingMaxHP').value);
             const newKeywords = document.getElementById('settingOCRKeywords').value;
+            const newWebhook = document.getElementById('settingDiscordWebhook').value;
 
             const tiers = {
                 s: parseInt(document.getElementById('tierS').value) || 1500000,
@@ -2853,6 +3211,7 @@
             if (!isNaN(newHp) && newHp > 0) {
                 STATE.config.bossMaxHp = newHp;
                 STATE.config.ocrKeywords = newKeywords;
+                STATE.config.discordWebhook = newWebhook; // Save Webhook
                 STATE.config.tiers = tiers;
                 CONSTANTS.BOSS_MAX_HP = newHp;
                 saveState('config');
@@ -2940,60 +3299,36 @@
                     const cvs = document.createElement('canvas');
                     const ctx = cvs.getContext('2d');
 
-                    let width = img.width;
-                    let height = img.height;
-                    const minDim = 2000;
-                    const scale = Math.max(minDim / width, minDim / height, 1);
-                    width = Math.round(width * scale);
-                    height = Math.round(height * scale);
+                    // 1. Upscale by 2.5x to separate edges
+                    const scale = 2.5;
+                    cvs.width = Math.round(img.width * scale);
+                    cvs.height = Math.round(img.height * scale);
 
-                    const padding = 40;
-                    cvs.width = width + (padding * 2);
-                    cvs.height = height + (padding * 2);
-
-                    ctx.fillStyle = "#FFFFFF";
-                    ctx.fillRect(0, 0, cvs.width, cvs.height);
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-                    ctx.drawImage(img, padding, padding, width, height);
+                    // 2. No smoothing for Sharpness
+                    ctx.imageSmoothingEnabled = false;
+                    ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
 
                     const idata = ctx.getImageData(0, 0, cvs.width, cvs.height);
                     const d = idata.data;
                     const len = d.length;
 
-                    // Otsu binarization
-                    let totalLuminance = 0;
-                    const grayArr = new Uint8Array(len / 4);
+                    // 3. Hard Threshold Binarization (Inverted for Tesseract)
+                    // Game screenshot logic: 
+                    // - Text is Light (White/Glowing)
+                    // - Background is Dark/Gradient
+                    // We want: Text -> Black(0), BG -> White(255)
                     for (let i = 0; i < len; i += 4) {
-                        const g = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-                        grayArr[i / 4] = g;
-                        totalLuminance += g;
-                    }
-                    const avgLum = totalLuminance / (len / 4);
-                    const isDarkTheme = avgLum < 128;
+                        // Calculate Luma
+                        const brightness = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
 
-                    const histogram = new Array(256).fill(0);
-                    for (let i = 0; i < grayArr.length; i++) histogram[grayArr[i]]++;
-
-                    let sum = 0, sumB = 0, wB = 0, wF = 0, maxVar = 0, threshold = 0;
-                    for (let i = 0; i < 256; i++) sum += i * histogram[i];
-
-                    for (let t = 0; t < 256; t++) {
-                        wB += histogram[t];
-                        if (wB === 0) continue;
-                        wF = (len / 4) - wB;
-                        if (wF === 0) break;
-                        sumB += t * histogram[t];
-                        const mB = sumB / wB;
-                        const mF = (sum - sumB) / wF;
-                        const varBetween = wB * wF * (mB - mF) * (mB - mF);
-                        if (varBetween > maxVar) { maxVar = varBetween; threshold = t; }
-                    }
-
-                    for (let i = 0; i < len; i += 4) {
-                        let g = grayArr[i / 4];
-                        let val = isDarkTheme ? (g > threshold ? 0 : 255) : (g < threshold ? 0 : 255);
-                        d[i] = d[i + 1] = d[i + 2] = val;
+                        // Threshold > 130 is Text (Light)
+                        if (brightness > 130) {
+                            // Make it Black for Tesseract
+                            d[i] = d[i + 1] = d[i + 2] = 0;
+                        } else {
+                            // Background -> White
+                            d[i] = d[i + 1] = d[i + 2] = 255;
+                        }
                     }
 
                     ctx.putImageData(idata, 0, 0);
@@ -3002,22 +3337,45 @@
             });
         }
 
-        let pendingOCRFile = null;
 
-        function processOCRFile(file) {
+        let pendingOCRFile = null;
+        let pendingTargetMember = null; // Stored index for Targeted OCR
+
+        function processOCRFile(file, targetMemberIdx = null) {
             pendingOCRFile = file;
+            pendingTargetMember = targetMemberIdx;
+
+            const modalTitle = document.querySelector('#ocrBossModal p');
+            if (targetMemberIdx !== null) {
+                const m = STATE.members[targetMemberIdx];
+                modalTitle.innerHTML = `<span class="text-indigo-600 font-bold">Scaning for: ${m.name}</span><br>Select Boss to update:`;
+            } else {
+                modalTitle.innerText = "Select Boss that corresponds to the image:";
+            }
+
             document.getElementById('ocrBossModal').classList.add('active');
+        }
+
+        function triggerTargetedOCR(idx) {
+            pendingTargetMember = idx;
+            closeModal('profileModal');
+            document.getElementById('ocrInput').click(); // Reuse existing input
         }
 
         function selectOCRBoss(idx) {
             document.getElementById('ocrBossModal').classList.remove('active');
             if (pendingOCRFile && idx >= 0) {
                 if (idx === 4) {
-                    runOCR(pendingOCRFile, 0, true);
+                    runOCR(pendingOCRFile, 0, true, pendingTargetMember);
                 } else {
-                    runOCR(pendingOCRFile, idx, false);
+                    runOCR(pendingOCRFile, idx, false, pendingTargetMember);
                 }
                 pendingOCRFile = null;
+                pendingTargetMember = null;
+            } else {
+                // Cancelled or invalid
+                pendingOCRFile = null;
+                pendingTargetMember = null;
             }
         }
 
@@ -3034,7 +3392,7 @@
             }
         }
 
-        async function runOCR(file, bossIdx, isDestroyer) {
+        async function runOCR(file, bossIdx, isDestroyer, targetMemberIdx = null) {
             const modal = document.getElementById('ocrProgressModal');
             const statusText = document.getElementById('ocrStatusText');
             const progressBar = document.getElementById('ocrProgressBar');
@@ -3067,7 +3425,7 @@
                             const p = 20 + (m.progress * 70);
                             progressBar.style.width = `${p}%`;
                             progressPercent.innerText = `${Math.round(p)}%`;
-                            statusText.innerText = "ðŸ§  Recognizing Text...";
+                            statusText.innerText = "Recognizing Text...";
                         }
                     }
                 });
@@ -3081,6 +3439,82 @@
                 let count = 0;
                 let updates = [];
                 const lines = text.split('\n');
+
+                // --- TARGETED OCR MODE ---
+                if (targetMemberIdx !== null) {
+                    const m = STATE.members[targetMemberIdx];
+                    statusText.innerText = `Analyzing for ${m.name}...`;
+                    const cleanText = text.replace(/\s+/g, ' ').toLowerCase();
+                    const allNumbers = cleanText.match(/[\d,.]+/g) || [];
+
+                    // 1. Find Score (Max Number > Threshold)
+                    // Candidates: remove commas, parse int, filter > threshold
+                    const candidates = allNumbers.map(n => parseInt(n.replace(/[,.]/g, ''))).filter(n => !isNaN(n) && n > CONFIG.MIN_SCORE_THRESHOLD);
+                    const maxScore = candidates.length > 0 ? Math.max(...candidates) : 0;
+
+                    // 2. Find Count (Small Number < 50, prioritize patterns)
+                    let foundCount = null;
+                    // Pattern: N/5
+                    const slashMatch = cleanText.match(/(\d+)\s*\/\s*5/);
+                    if (slashMatch) foundCount = parseInt(slashMatch[1]);
+
+                    if (foundCount === null) {
+                        const keywords = STATE.config.ocrKeywords.split(',').map(k => k.trim().toLowerCase());
+                        for (let k of keywords) {
+                            // Keyword...Number
+                            const r1 = new RegExp(`${k}.{0,10}?(\\d{1,2})`, 'i');
+                            const m1 = cleanText.match(r1);
+                            if (m1) { foundCount = parseInt(m1[1]); break; }
+
+                            // Number...Keyword
+                            const r2 = new RegExp(`(\\d{1,2}).{0,10}?${k}`, 'i');
+                            const m2 = cleanText.match(r2);
+                            if (m2) { foundCount = parseInt(m2[1]); break; }
+                        }
+                    }
+
+                    // Fallback Count: Max small number found
+                    if (foundCount === null) {
+                        const smalls = (cleanText.match(/\d+/g) || []).map(Number).filter(n => n > 0 && n <= 50);
+                        if (smalls.length > 0) foundCount = Math.max(...smalls);
+                    }
+
+                    // Update Data
+                    let msg = [];
+                    if (isDestroyer) {
+                        // God Mode: Only Score
+                        if (maxScore > 0) {
+                            m.v2 = maxScore;
+                            msg.push(`Score: ${maxScore.toLocaleString()}`);
+                        }
+                    } else {
+                        // Normal Boss: Score + Count
+                        if (maxScore > 0) {
+                            m.d[bossIdx] = maxScore;
+                            msg.push(`Dmg: ${maxScore.toLocaleString()}`);
+                        }
+
+                        if (foundCount !== null) {
+                            m.v[bossIdx] = foundCount;
+                            msg.push(`Count: ${foundCount}`);
+                        } else if (maxScore > 0 && m.v[bossIdx] === 0) {
+                            // Default count if only score found
+                            m.v[bossIdx] = 1;
+                            msg.push(`Count: 1 (Def)`);
+                        }
+                    }
+
+                    modal.classList.remove('active');
+                    if (msg.length > 0) {
+                        showToast(`Updated ${m.name} -> ${msg.join(', ')}`, 'success');
+                        saveState('ocrTargeted');
+                        render();
+                    } else {
+                        showToast(`No data found for ${m.name}`, 'warning');
+                    }
+                    return; // EXIT TARGETED MODE
+                }
+
                 const keywords = STATE.config.ocrKeywords.split(',').map(k => k.trim().toLowerCase());
 
                 // DEBUG: Log OCR output to console
@@ -3313,48 +3747,146 @@
 
         function triggerImportCSV() { document.getElementById('csvImportInput').click(); }
 
+        // --- CSV System Upgrade (Full Data + Excel Support) ---
+
+        function exportCSV() {
+            // 1. BOM for Excel to read Thai/UTF-8 correctly
+            let csvContent = "\uFEFF";
+
+            // 2. Header Row
+            const headers = ["Name", "Teo", "Kyle", "Yeonhee", "Karma", "God_Destruction", "Note"];
+            csvContent += headers.join(",") + "\n";
+
+            // 3. Data Rows
+            STATE.members.forEach(m => {
+                const row = [];
+                // Name -> Escape commas/quotes
+                row.push(`"${m.name.replace(/"/g, '""')}"`);
+
+                // Boss 1-4 (Damage by default, or Count if strictly needed? User asked for simplicity/robustness. 
+                // Context implies mostly Damage/Attempts. Let's export currently tracked stats but focusing on Dmg is safer for "Score".)
+                // Prompt: "Get values from m.d... or m.v depending on STATE.mode... actually better to export DAMAGE values by default"
+                // Decision: Export Damage (m.d) for bosses 1-4 as they are key.
+                for (let i = 0; i < 4; i++) {
+                    row.push(m.d[i] || 0);
+                }
+
+                // God (Damage)
+                row.push(m.v2 || 0);
+
+                // Note -> Escape newlines/quotes
+                const cleanNote = (m.note || "").replace(/"/g, '""').replace(/\n/g, ' ');
+                row.push(`"${cleanNote}"`);
+
+                csvContent += row.join(",") + "\n";
+            });
+
+            // 4. Download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            const dateStr = new Date().toISOString().split('T')[0];
+            link.setAttribute("href", url);
+            link.setAttribute("download", `BossGuild_Export_${dateStr}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("CSV Exported (Excel Ready)", "success");
+            closeModal('exportModal');
+        }
+
         function handleCSVImport(input) {
             const file = input.files[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = function (e) {
                 const text = e.target.result;
-                const lines = text.split('\n');
-                let startIndex = 0;
-                if (lines[0].toLowerCase().includes('name')) startIndex = 1;
+                const lines = text.split(/\r\n|\n/); // Handle different EOLs
 
-                let count = 0;
-                for (let i = startIndex; i < lines.length; i++) {
+                // Basic validation
+                if (lines.length < 1) {
+                    showToast("Empty file", "warning");
+                    return;
+                }
+
+                let updatedCount = 0;
+                let addedCount = 0;
+
+                // Skip Header (Start from index 1)
+                for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
-                    const parts = line.split(',');
-                    if (parts.length < 2) continue;
 
-                    const name = parts[0].trim();
+                    // Smart Split (Handles quoted strings)
+                    // Matches: "quoted value" OR non-comma-sequence
+                    const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+
+                    // Fallback to simple split if regex fails (shouldn't if valid CSV)
+                    const parts = matches.length > 0 ? matches : line.split(',');
+
+                    // Index Mapping (Matches exportCSV headers)
+                    // 0: Name, 1: Teo, 2: Kyle, 3: Yeonhee, 4: Karma, 5: God, 6: Note
+
+                    let name = parts[0];
+                    if (!name) continue;
+                    // Remove quotes from Name
+                    name = name.replace(/^"|"$/g, '').trim();
+                    if (!name) continue;
+
                     let member = STATE.members.find(m => m.name === name);
+
                     if (!member) {
                         member = { name: name, v: [0, 0, 0, 0], d: [0, 0, 0, 0], v2: 0, note: "" };
                         STATE.members.push(member);
+                        addedCount++;
+                    } else {
+                        updatedCount++;
                     }
 
-                    if (parts.length >= 6) {
-                        for (let j = 0; j < 4; j++) {
-                            const val = parseInt(parts[j + 1]);
-                            if (!isNaN(val)) member.v[j] = val;
+                    // Helper to parse int (handle "1,000" string)
+                    const parse = (val) => {
+                        if (!val) return null;
+                        const clean = val.replace(/^"|"$/g, '').replace(/,/g, '');
+                        const n = parseInt(clean);
+                        return isNaN(n) ? null : n;
+                    };
+
+                    // Boss 1-4 (Teo, Kyle, Yeonhee, Karma)
+                    for (let j = 0; j < 4; j++) {
+                        // Parts 1-4
+                        if (parts[j + 1] !== undefined) {
+                            const val = parse(parts[j + 1]);
+                            if (val !== null) member.d[j] = val;
                         }
-                    } else if (parts.length >= 2) {
-                        const val = parseInt(parts[1]);
-                        if (!isNaN(val)) member.v2 = val;
                     }
-                    count++;
+
+                    // God Mode (Part 5)
+                    if (parts[5] !== undefined) {
+                        const val = parse(parts[5]);
+                        if (val !== null) member.v2 = val;
+                    }
+
+                    // Note (Part 6)
+                    if (parts[6] !== undefined) {
+                        member.note = parts[6].replace(/^"|"$/g, '').trim();
+                    }
                 }
+
                 saveState('importCSV');
                 render();
-                showToast(`Imported ${count} records`, "success");
+                // Check if any errors or just success
+                if (updatedCount === 0 && addedCount === 0) {
+                    showToast("No valid data imported", "warning");
+                } else {
+                    showToast(`Imported: ${updatedCount} Updated, ${addedCount} New`, "success");
+                }
                 closeModal('exportModal');
+                input.value = ''; // Reset input
             };
             reader.readAsText(file);
-            input.value = '';
         }
 
         function exportPDF() {
@@ -3402,15 +3934,28 @@
                 let grandTotal = 0;
                 let max = -1;
                 let mvp = '-';
+                let activeCount = 0;
 
                 STATE.members.forEach(m => {
                     const s = getMemberStats(m);
                     grandTotal += s.total;
+                    if (s.total > 0) activeCount++;
                     if (s.total > max) { max = s.total; mvp = m.name; }
                 });
 
-                document.getElementById('story-wood').innerText = grandTotal;
+                // Update DOM with Formatted Numbers
+                document.getElementById('story-wood').innerText = grandTotal.toLocaleString();
                 document.getElementById('story-mvp').innerText = escapeHTML(mvp);
+
+                // New Premium Stats
+                document.getElementById('story-top-dmg').innerText = max > 0 ? max.toLocaleString() : "0";
+                document.getElementById('story-active-count').innerText = activeCount;
+
+                // Chart Label Calculation
+                const totalPossible = (STATE.members.length || 1) * days;
+                const percent = totalPossible > 0 ? Math.round((grandTotal / totalPossible) * 100) : 0;
+                const chartLabel = document.getElementById('story-chart-label');
+                if (chartLabel) chartLabel.innerText = percent + '%';
 
                 const ctx = document.getElementById('storyChart').getContext('2d');
                 // Memory Leak Fix: Destroy previous chart instance
@@ -3419,9 +3964,20 @@
                     type: 'doughnut',
                     data: {
                         labels: ['Done', 'Left'],
-                        datasets: [{ data: [grandTotal, (STATE.members.length * days) - grandTotal], backgroundColor: ['#57534E', '#E7E5E4'], borderWidth: 0 }]
+                        datasets: [{
+                            data: [grandTotal, Math.max(0, totalPossible - grandTotal)],
+                            // Using Gold (#D97706) for progress to match Premium feel
+                            backgroundColor: ['#D97706', 'rgba(0,0,0,0.05)'],
+                            borderWidth: 0
+                        }]
                     },
-                    options: { cutout: '80%', plugins: { legend: { display: false } }, animation: false }
+                    options: {
+                        cutout: '85%',
+                        plugins: { legend: { display: false } },
+                        animation: false,
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
                 });
 
                 element = storyEl;
@@ -3486,6 +4042,71 @@
                 }
             });
         }
+
+        async function sendToDiscord() {
+            const webhookURL = STATE.config.discordWebhook;
+            if (!webhookURL) {
+                showToast("No Webhook URL set! Please go to Settings.", "warning");
+                // Open settings automatically
+                toggleSettings();
+                return;
+            }
+
+            showToast("Sending to Discord...", "info");
+
+            const days = STATE.page === 1 ? STATE.days1 : STATE.days2;
+            const totalPossible = days * STATE.members.length;
+            let grandTotal = 0;
+
+            // Build Report Content
+            let completedList = [];
+            let missingList = [];
+
+            STATE.members.forEach(m => {
+                const stats = getMemberStats(m);
+                grandTotal += stats.total;
+                if (stats.total >= days) {
+                    completedList.push(m.name);
+                } else {
+                    missingList.push(`- ${m.name} (${stats.total}/${days})`);
+                }
+            });
+
+            const percent = totalPossible > 0 ? (grandTotal / totalPossible * 100).toFixed(1) : 0;
+            const isComplete = percent >= 100;
+
+            // Embed Object
+            const embed = {
+                title: `Boss Guild Report (Day ${days})`,
+                description: `**Progress:** ${percent}% (${grandTotal}/${totalPossible})\n\n**Missing Members:**\n${missingList.length > 0 ? "```" + missingList.join("\n") + "```" : "âœ… All members completed!"}`,
+                color: isComplete ? 0xFFD700 : 0x5865F2, // Gold or Discord Blurple
+                footer: {
+                    text: "Seven Knights Re:Birth  Tracker"
+                },
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ embeds: [embed] }),
+                });
+
+                if (response.ok) {
+                    showToast("Sent to Discord!", "success");
+                    playTone('success');
+                } else {
+                    const errText = await response.text();
+                    console.error("Discord Error:", errText);
+                    showToast("Failed to send (Check URL)", "danger");
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                showToast("Network Error", "danger");
+            }
+        }
+
 
         function copySmartReport() {
             const days = STATE.page === 1 ? STATE.days1 : STATE.days2;
@@ -3560,7 +4181,20 @@
                     const item = items[index];
                     if (item.kind === 'file' && item.type.includes('image/')) {
                         const blob = item.getAsFile();
-                        processOCRFile(blob);
+
+                        // Check if Profile Modal is Open (Context-Aware Paste)
+                        // If open -> Targeted OCR for that member
+                        // If closed -> Global OCR
+                        const profileModal = document.getElementById('profileModal');
+                        if (profileModal.classList.contains('active')) {
+                            // Targeted Mode
+                            closeModal('profileModal');
+                            processOCRFile(blob, STATE.selectedMember);
+                        } else {
+                            // Global Mode
+                            processOCRFile(blob, null);
+                        }
+
                         e.preventDefault();
                         break;
                     }
@@ -3568,18 +4202,7 @@
             });
         }
     </script>
-    <!-- Leaderboard Modal -->
-    <div class="modal-overlay" id="leaderboardModal">
-        <div class="modal">
-            <div class="flex justify-between items-center mb-6 pb-4 border-b border-stone-100 dark:border-stone-700">
-                <h3 class="font-serif text-2xl text-stone-800 dark:text-stone-100"><i
-                        class="fas fa-trophy text-amber-500 mr-2"></i>Leaderboard</h3>
-                <button class="text-stone-400 hover:text-stone-600" onclick="closeModal('leaderboardModal')"><i
-                        class="fas fa-times text-xl"></i></button>
-            </div>
-            <div id="leaderboard-list" class="max-h-96 overflow-y-auto"></div>
-        </div>
-    </div>
+
 
     <!-- Universal Input Modal -->
     <div class="modal-overlay" id="inputModal">
@@ -3664,6 +4287,18 @@
             }
         });
     </script>
+    <!-- Watermark Decoration -->
+    <div id="watermark-decoration" class="watermark-decoration">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+        </svg>
+    </div>
+
+    <!-- App Footer -->
+    <div class="app-footer">
+        BossGuild v2.0 • Crafted for Seven Knights Idle
+    </div>
 </body>
 
 
